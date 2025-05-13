@@ -1,0 +1,4 @@
+protocol PaywallRouter {
+
+    func closePaywall()
+}

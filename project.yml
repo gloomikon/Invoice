@@ -1,0 +1,116 @@
+name: Invoice
+
+packages:
+    XCoordinator:
+        path: Packages/XCoordinator
+    DebugPanel:
+        path: Packages/DebugPanel
+    EventKit:
+        path: Packages/EventKit
+    Networking:
+        path: Packages/Networking
+    Depin:
+        github: KOMA-Inc/Depin
+        from: 3.1.0
+    FoundationExt:
+        path: Packages/FoundationExt
+    CombineExt:
+        path: Packages/CombineExt
+    SwiftUIExt:
+        path: Packages/SwiftUIExt
+    UIKitExt:
+        path: Packages/UIKitExt
+#    Amplitude:
+#        github: amplitude/Amplitude-iOS
+#        from: 8.22.0
+#    Firebase:
+#        github: firebase/firebase-ios-sdk.git
+#        from: 11.5.0
+#    RevenueCat:
+#        github: RevenueCat/purchases-ios-spm.git
+#        from: 5.22.0
+
+options:
+    createItermediateGroups: true
+    useBaseInternationalization: false
+
+settings:
+    base:
+        CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: NO
+        IPHONEOS_DEPLOYMENT_TARGET: 16.0
+
+fileGroups:
+    - project.yml
+    - .swiftlint.yml
+
+configFiles:
+    Debug: Configs/Project-Debug.xcconfig
+    Release: Configs/Project-Release.xcconfig
+
+targets:
+    Invoice:
+        configFiles:
+            Debug: Configs/Invoice/Debug.xcconfig
+            Release: Configs/Invoice/Release.xcconfig
+        dependencies:
+        -   package: XCoordinator
+        -   package: DebugPanel
+        -   package: Depin
+        -   package: EventKit
+        -   package: Networking
+        -   package: FoundationExt
+        -   package: CombineExt
+        -   package: SwiftUIExt
+        -   package: UIKitExt
+#        -   package: Firebase
+#            product: FirebaseCrashlytics
+#        -   package: Amplitude
+#        -   package: RevenueCat
+#        -   sdk:     CoreServices.framework
+#        -   sdk:     SystemConfiguration.framework
+#        -   sdk:     WebKit.framework
+#        -   sdk:     CoreSpotlight.framework
+#        -   sdk:     AdServices.framework
+#        -   sdk:     AdSupport.framework
+#        -   sdk:     StoreKit.framework
+#        -   sdk:     LinkPresentation.framework
+#        -   sdk:     AppTrackingTransparency.framework
+        platform: iOS
+
+        postCompileScripts:
+
+        -   name: Swiftlint
+            script: |
+                # Type a script or drag a script file from your workspace to insert its path.
+                export PATH="$PATH:/opt/homebrew/bin"
+                if which swiftlint > /dev/null; then
+                    swiftlint
+                else
+                    echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
+                fi
+            basedOnDependencyAnalysis: false
+
+#        postBuildScripts:
+#
+#        -   name: Crashlyrics
+#            script: |
+#                ${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run
+#
+#            basedOnDependencyAnalysis: false
+#            inputFiles:
+#            -   ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}
+#            -   ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}
+#            -   ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist
+#            -   $(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist
+#            -   $(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)
+
+        sources:
+        -   Invoice
+        -   Configs
+        type: application
+
+schemes:
+    Invoice:
+        build:
+            targets:
+                Invoice: all

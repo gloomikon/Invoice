@@ -1,0 +1,126 @@
+analyzer_rules:
+  - unused_import
+disabled_rules:
+  - type_name
+  - function_body_length
+  - file_length
+  - type_body_length
+  - large_tuple
+  - nesting
+  - function_parameter_count
+  - void_function_in_ternary
+opt_in_rules:
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - contains_over_first_not_nil
+  - contains_over_range_nil_comparison
+  - convenience_type
+  - empty_collection_literal
+  - empty_count
+  - empty_string
+  - file_name
+  - file_name_no_space
+  - first_where
+  - force_unwrapping
+  - joined_default_parameter
+  - last_where
+  - literal_expression_end_indentation
+  - lower_acl_than_parent
+  - multiline_arguments
+  - multiline_arguments_brackets
+  - multiline_function_chains
+  - multiline_literal_brackets
+  - multiline_parameters
+  - multiline_parameters_brackets
+  - private_outlet
+  - private_action
+  - switch_case_on_newline
+  - weak_delegate
+  - strong_iboutlet
+  - sorted_imports
+  - explicit_init
+  - deployment_target
+  - overridden_super_call
+  - protocol_property_accessors_order
+  - redundant_type_annotation
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - trailing_semicolon
+  - closing_brace
+  - opening_brace
+  - return_arrow_whitespace
+  - statement_position
+  - colon
+  - comma
+#  - trailing_closure
+  - operator_usage_whitespace
+  - closure_spacing
+  - discouraged_direct_init
+  - implicit_return
+
+cyclomatic_complexity:
+    ignores_case_statements: true
+
+file_name:
+    excluded:
+    - Types.swift
+    - GestureRecognizers+Combine.swift
+    - ExperimentalGroupTrackable.swift
+
+identifier_name:
+    max_length:
+        warning: 50
+    excluded:
+    - id
+    - up
+    - ip
+    - i
+    - ok
+    - as
+    # coordinates
+    - x
+    - y
+    - z
+    # colors
+    - r
+    - g
+    - b
+    - a
+    # footcandles
+    - fc
+    # quality assurance
+    - qa
+    - no
+    - ai
+
+custom_rules:
+    localizable:
+        name: "Localizable"
+        regex: '.\.localized\([^)]*\)'
+        message: ".localized() should be used in I18n.swift only"
+        severity: warning
+        excluded:
+        - I18n.swift
+
+    tabs:
+        name: "Tab Whitespace"
+        regex: "\\t"
+        message: "Using tabs is discouraged. Use spaces only."
+        severity: warning
+
+    mark_newlines:
+        included: ".*.swift"
+        name: "MARK newlines surrounding"
+        regex: '(([}{)\w \t]+\n{1}[ \t]*)(\/\/ MARK: - [\w ]*))|((\/\/ MARK: - [\w ]*)(\n{1}[ \t]*\w+))'
+        message: "Every MARK should be surrounded with 1 newline before and 1 after it"
+        severity: warning
+
+    boolean_return:
+        name: "Boolean Return"
+        regex: "\\? (true : false)|(false : true)"
+        message: "It is redundant to return true or false for a boolean value. Instead return the value itself."
+        severity: warning
+
+
+excluded:
+    - Packages/*

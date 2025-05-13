@@ -1,0 +1,4 @@
+protocol OnboardingRouter {
+
+    func openPaywallFromOnboarding()
+}
