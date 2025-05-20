@@ -5,15 +5,6 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier will be used to deliver personalized ads and improve app experience</string>
-	<key>NSCameraUsageDescription</key>
-	<string>This app requires access to the camera to take photos and videos</string>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>googlegmail</string>
-		<string>ms-outlook</string>
-		<string>ymail</string>
-		<string>readdle-spark</string>
-	</array>
+	<string>We value your privacy. This helps us provide you with a better experience and relevant content. Help us improve your experience by allowing app tracking</string>
 </dict>
 </plist>

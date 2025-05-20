@@ -20,6 +20,8 @@ packages:
         path: Packages/SwiftUIExt
     UIKitExt:
         path: Packages/UIKitExt
+    Core:
+        path: Packages/Core
 #    Amplitude:
 #        github: amplitude/Amplitude-iOS
 #        from: 8.22.0
@@ -62,6 +64,7 @@ targets:
         -   package: CombineExt
         -   package: SwiftUIExt
         -   package: UIKitExt
+        -   package: Core
 #        -   package: Firebase
 #            product: FirebaseCrashlytics
 #        -   package: Amplitude
