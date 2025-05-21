@@ -28,9 +28,9 @@ packages:
 #    Firebase:
 #        github: firebase/firebase-ios-sdk.git
 #        from: 11.5.0
-#    RevenueCat:
-#        github: RevenueCat/purchases-ios-spm.git
-#        from: 5.22.0
+    RevenueCat:
+        github: RevenueCat/purchases-ios-spm.git
+        from: 5.24.0
 
 options:
     createItermediateGroups: true
@@ -68,7 +68,7 @@ targets:
 #        -   package: Firebase
 #            product: FirebaseCrashlytics
 #        -   package: Amplitude
-#        -   package: RevenueCat
+        -   package: RevenueCat
 #        -   sdk:     CoreServices.framework
 #        -   sdk:     SystemConfiguration.framework
 #        -   sdk:     WebKit.framework

@@ -7,6 +7,7 @@ class SplashViewModel: ObservableObject {
 
     // MARK: - Injected properties
 
+    @Injected private var startupService: StartupService
     private let router: SplashRouter
 
     // MARK: - Private properties
@@ -28,9 +29,12 @@ class SplashViewModel: ObservableObject {
 
     private func start() async {
         await ATTManager.requestAuthorization()
+        await startupService.start()
+        await openNextScreen()
     }
 
-    func openOnboarding() {
+    @MainActor
+    private func openNextScreen() async {
         router.openOnboardingFromSplash()
     }
 }

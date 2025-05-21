@@ -9,10 +9,6 @@ struct SplashView: View {
             Spacer()
             Text("Splash")
             Spacer()
-            Button("Continue") {
-                viewModel.openOnboarding()
-            }
-            .buttonStyle(.bordered)
         }
         .padding()
         .frame(maxWidth: .infinity)

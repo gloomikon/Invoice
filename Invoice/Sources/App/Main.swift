@@ -10,7 +10,8 @@ enum Main {
     static func main() {
 
         assembler.apply {
-
+            AppAssembly()
+            PaywallAssembly()
         }
 
         UIApplicationMain(

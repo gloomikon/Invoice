@@ -28,12 +28,10 @@ class AppCoordinator: NavigationCoordinator<AppRoute> {
             return .set(module, animation: .fade)
 
         case .paywall:
-            let module = PaywallModule(router: self)
-            return .present(module, modalPresentationStyle: .fullScreen)
+            return .none(PaywallCoordinator(rootViewController: rootViewController, paywallTrigger: .onboarding))
 
         case .main:
-            let module = MainModule(router: self)
-            return .multiple(.set(module), .dismiss())
+            return .none(MainCoordinator(rootViewController: rootViewController))
         }
     }
 }
@@ -54,19 +52,4 @@ extension AppCoordinator: OnboardingRouter {
     func openPaywallFromOnboarding() {
         trigger(.paywall)
     }
-}
-
-// MARK: - PaywallRouter
-
-extension AppCoordinator: PaywallRouter {
-
-    func closePaywall() {
-        trigger(.main)
-    }
-}
-
-// MARK: - MainRouter
-
-extension AppCoordinator: MainRouter {
-
 }

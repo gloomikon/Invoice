@@ -1,0 +1,4 @@
+protocol WebPageRouter {
+
+    func close()
+}

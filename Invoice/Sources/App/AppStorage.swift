@@ -1,9 +1,33 @@
+import Core
+import DebugPanel
 import FoundationExt
 
-class AppInfoProvider {
+class AppStorage {
 
     private enum Constant {
         static let deviceUDID = "deviceUDID"
+    }
+
+    @Storage("didLaunchApp", default: false)
+    var didLaunchApp
+
+    @Storage("didSeePaywall", default: false)
+    var didSeePaywall
+
+    private var realIsPremium = false
+
+    var isPremium: Bool {
+        get {
+            switch DebugPanelStorage.shared.boolRemoteValue(for: "debug_is_premium") {
+            case .default:
+                realIsPremium
+            case .selected(let value):
+                value
+            }
+        }
+        set {
+            realIsPremium = newValue
+        }
     }
 
     // TODO: - Fix

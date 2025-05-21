@@ -21,7 +21,6 @@ opt_in_rules:
   - file_name
   - file_name_no_space
   - first_where
-  - force_unwrapping
   - joined_default_parameter
   - last_where
   - literal_expression_end_indentation
