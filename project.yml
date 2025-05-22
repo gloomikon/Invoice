@@ -22,9 +22,9 @@ packages:
         path: Packages/UIKitExt
     Core:
         path: Packages/Core
-#    Amplitude:
-#        github: amplitude/Amplitude-iOS
-#        from: 8.22.0
+    Amplitude:
+        github: amplitude/Amplitude-iOS
+        from: 8.22.0
 #    Firebase:
 #        github: firebase/firebase-ios-sdk.git
 #        from: 11.5.0
@@ -67,7 +67,7 @@ targets:
         -   package: Core
 #        -   package: Firebase
 #            product: FirebaseCrashlytics
-#        -   package: Amplitude
+        -   package: Amplitude
         -   package: RevenueCat
 #        -   sdk:     CoreServices.framework
 #        -   sdk:     SystemConfiguration.framework

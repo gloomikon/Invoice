@@ -2,6 +2,24 @@
   "object": {
     "pins": [
       {
+        "package": "Amplitude",
+        "repositoryURL": "https://github.com/amplitude/Amplitude-iOS",
+        "state": {
+          "branch": null,
+          "revision": "4471ff73fffdff9a9b256422a0a0b9233582f33d",
+          "version": "8.22.0"
+        }
+      },
+      {
+        "package": "analytics-connector-ios",
+        "repositoryURL": "https://github.com/amplitude/analytics-connector-ios.git",
+        "state": {
+          "branch": null,
+          "revision": "4adbfe85486e6dcdcdca5fa9362097ffe5ec712b",
+          "version": "1.3.1"
+        }
+      },
+      {
         "package": "Depin",
         "repositoryURL": "https://github.com/KOMA-Inc/Depin",
         "state": {

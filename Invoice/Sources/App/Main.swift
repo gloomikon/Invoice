@@ -12,7 +12,10 @@ enum Main {
         assembler.apply {
             AppAssembly()
             PaywallAssembly()
+            AnalyticsAssembly()
         }
+
+        startProcessors()
 
         UIApplicationMain(
             CommandLine.argc,
@@ -20,5 +23,12 @@ enum Main {
             nil,
             NSStringFromClass(AppDelegate.self)
         )
+    }
+
+    private static func startProcessors() {
+        @Injected var compositor: AnalyticsClientCompositor
+        compositor.start()
+
+        PaywallEventProcessor().start()
     }
 }
