@@ -11,5 +11,10 @@ class AppAssembly: Assembly {
         container.register(AppStorage.self) {
             AppStorage()
         }
+
+        container.register(RemoteConfigService.self) {
+            RemoteConfigService(provider: FirebaseRemoteConfigProvider())
+        }
+        .inObjectScope(.container)
     }
 }

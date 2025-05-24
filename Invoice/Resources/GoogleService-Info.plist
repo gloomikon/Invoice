@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1011444110859-nvo0l726dtae6c54p19vd08650j4u5ch.apps.googleusercontent.com</string>
+	<key>DATABASE_URL</key>
+	<string>https://dev-plantyx.firebaseio.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1011444110859-nvo0l726dtae6c54p19vd08650j4u5ch</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAuKtQH4ryhbo4SISDoc7bONwFWuaOaU6U</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1011444110859</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.angelscope.ios.plantyx</string>
+	<key>PROJECT_ID</key>
+	<string>dev-plantyx</string>
+	<key>STORAGE_BUCKET</key>
+	<string>dev-plantyx.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<true/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1011444110859:ios:f10f80ce69da6a86ed990e</string>
+</dict>
+</plist>

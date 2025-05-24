@@ -8,9 +8,8 @@ extension EventProcessor {
 
     private static var clients: [AnalyticsClient] {
         @Injected var amplitude: AmplitudeClient
-        return [
-            amplitude
-        ]
+        @Injected var crashlytics: CrashlyticsClient
+        return [amplitude, crashlytics]
     }
 
     func send(_ name: String, with params: [String: CustomStringConvertible]? = nil) {
