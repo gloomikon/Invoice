@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "AdjustSignature",
+        "repositoryURL": "https://github.com/adjust/adjust_signature_sdk.git",
+        "state": {
+          "branch": null,
+          "revision": "93c40d7fa27b709a81adc50e41b400ce4411c7ff",
+          "version": "3.35.2"
+        }
+      },
+      {
         "package": "Amplitude",
         "repositoryURL": "https://github.com/amplitude/Amplitude-iOS",
         "state": {
@@ -35,6 +44,15 @@
           "branch": null,
           "revision": "8e0908cb4b88f629fd8041b361f081ec8486c056",
           "version": "0.4.0"
+        }
+      },
+      {
+        "package": "AdjustSdk",
+        "repositoryURL": "https://github.com/adjust/ios_sdk",
+        "state": {
+          "branch": null,
+          "revision": "e2d063a30318c7f8169b39f81aec627f44cf81b7",
+          "version": "5.4.0"
         }
       },
       {

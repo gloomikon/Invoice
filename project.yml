@@ -31,6 +31,9 @@ packages:
     RevenueCat:
         github: RevenueCat/purchases-ios-spm.git
         from: 5.24.0
+    Adjust:
+        github: adjust/ios_sdk
+        from: 5.4.0
 
 options:
     createItermediateGroups: true
@@ -65,19 +68,21 @@ targets:
         -   package: SwiftUIExt
         -   package: UIKitExt
         -   package: Core
+        -   package: Adjust
+            product: AdjustSdk
 #        -   package: Firebase
 #            product: FirebaseCrashlytics
         -   package: Amplitude
         -   package: RevenueCat
-#        -   sdk:     CoreServices.framework
-#        -   sdk:     SystemConfiguration.framework
-#        -   sdk:     WebKit.framework
-#        -   sdk:     CoreSpotlight.framework
-#        -   sdk:     AdServices.framework
-#        -   sdk:     AdSupport.framework
-#        -   sdk:     StoreKit.framework
-#        -   sdk:     LinkPresentation.framework
-#        -   sdk:     AppTrackingTransparency.framework
+#        -   sdk:     CoreServices.framework            # Branch
+#        -   sdk:     SystemConfiguration.framework     # Branch
+#        -   sdk:     WebKit.framework                  # Branch Adjust
+#        -   sdk:     CoreSpotlight.framework           # Branch
+#        -   sdk:     AdServices.framework              # Branch Adjust ASA
+#        -   sdk:     AdSupport.framework               # Branch Adjust AF
+#        -   sdk:     StoreKit.framework                # Branch Adjust
+#        -   sdk:     LinkPresentation.framework        # Branch
+#        -   sdk:     AppTrackingTransparency.framework # Branch Adjust
         platform: iOS
 
         postCompileScripts:

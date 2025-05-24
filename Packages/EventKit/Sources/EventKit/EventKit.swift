@@ -29,6 +29,20 @@ extension EventProcessor {
     }
 }
 
+public protocol CompositeEventProcessor: AnyObject {
+    func process<E: Event>(_ event: E)
+}
+
+public extension CompositeEventProcessor {
+    func start() {
+        EventProcessorsIncubator.shared.addProcessor(self)
+    }
+
+    func stop() {
+        EventProcessorsIncubator.shared.removeProcessor(self)
+    }
+}
+
 private class EventProcessorsIncubator {
 
     static let shared = EventProcessorsIncubator()
@@ -36,6 +50,7 @@ private class EventProcessorsIncubator {
     private init() { }
 
     private var processors: [ObjectIdentifier: [any EventProcessor]] = [:]
+    private var compositeProcessors: [ObjectIdentifier: CompositeEventProcessor] = [:]
 
     func process(_ event: Event) {
         let key = key(for: event)
@@ -43,11 +58,19 @@ private class EventProcessorsIncubator {
         processors.forEach { processor in
             processor._process(event)
         }
+        compositeProcessors.values.forEach { processor in
+            processor.process(event)
+        }
     }
 
     func addProcessor<Processor: EventProcessor>(_ processor: Processor) {
         let key = ObjectIdentifier(Processor.EventType.self)
         processors[key, default: []].append(processor)
+    }
+
+    func addProcessor<Processor: CompositeEventProcessor>(_ processor: Processor) {
+        let key = key(for: processor)
+        compositeProcessors[key] = processor
     }
 
     func removeProcessor<Processor: EventProcessor>(_ processor: Processor) {
@@ -60,7 +83,18 @@ private class EventProcessorsIncubator {
         }
     }
 
+    func removeProcessor<Processor: CompositeEventProcessor>(_ processor: Processor) {
+        let key = key(for: processor)
+        compositeProcessors[key] = nil
+    }
+
     private func key(for event: Event) -> ObjectIdentifier {
         ObjectIdentifier(type(of: event))
+    }
+
+    private func key<Processor: CompositeEventProcessor>(
+        for processor: Processor
+    ) -> ObjectIdentifier {
+        ObjectIdentifier(processor)
     }
 }

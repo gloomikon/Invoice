@@ -1,4 +1,5 @@
 import Depin
+import EventKit
 import FoundationExt
 import RevenueCat
 
@@ -124,6 +125,29 @@ class PurchaseManager {
             return
         } else {
             throw PurchaseManagerError.nothingToRestore
+        }
+    }
+}
+
+extension PurchaseManager: CompositeEventProcessor {
+
+    func process<E: Event>(_ event: E) {
+        switch event {
+        case let event as AdjustEvent:
+            process(event)
+        default:
+            break
+        }
+    }
+
+    private func process(_ event: AdjustEvent) {
+        switch event {
+        case .gotAdjustID(let adjustID):
+            performIfConfigured {
+                Purchases.shared.attribution.setAdjustID(adjustID)
+            }
+        default:
+            break
         }
     }
 }

@@ -7,4 +7,5 @@ enum AppConstant {
     static let termsOfUse = URL(string: "https://github.com/gloomikon")!
 
     static let amplitudeAPIKey = ""
+    static let adjustAppToken = ""
 }

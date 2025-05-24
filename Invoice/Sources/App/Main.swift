@@ -29,6 +29,10 @@ enum Main {
         @Injected var compositor: AnalyticsClientCompositor
         compositor.start()
 
+        @Injected var purchaseManager: PurchaseManager
+        purchaseManager.start()
+
         PaywallEventProcessor().start()
+        AdjustEventProcessor().start()
     }
 }
