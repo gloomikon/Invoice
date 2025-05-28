@@ -6,7 +6,7 @@ struct InvoiceInput {
     let number: String
 
     let issuedDate: Date
-    let dueDate: Date
+    let dueDate: Date?
 
     let issuer: Party
     let recipient: Party
@@ -62,7 +62,6 @@ extension InvoiceInput {
     }
 
     struct Currency {
-        let amount: Double
         let code: String
         let symbol: String
     }
@@ -70,16 +69,17 @@ extension InvoiceInput {
     struct WorkItem {
 
         enum UnitType {
+            case item
             case hour
             case day
         }
 
         let name: String
-        let description: String
+        let description: String?
 
         let price: Double
         let quantity: Double
-        let unitType: UnitType?
+        let unitType: UnitType
         let discount: DiscountType?
 
         let taxable: Bool
