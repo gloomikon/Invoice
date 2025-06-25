@@ -87,7 +87,11 @@ extension Managed where Self: NSManagedObject {
     ///   - predicate: Search predicate.
     ///   - configure: Configuration block for newly created object.
     /// - Returns: Existing or newly created object.
-    static func findOrCreate(in context: NSManagedObjectContext, matching predicate: NSPredicate, configure: (Self) -> Void) -> Self {
+    static func findOrCreate(
+        in context: NSManagedObjectContext,
+        matching predicate: NSPredicate,
+        configure: (Self) -> Void
+    ) -> Self {
         guard let object = findOrFetch(in: context, matching: predicate) else {
             let newObject: Self = context.insertObject()
             configure(newObject)
@@ -144,7 +148,12 @@ extension Managed where Self: NSManagedObject {
     ///   - context: Core Data context.
     ///   - configurationBlock: Configuration block for the request.
     /// - Returns: Fetched objects.
-    static func fetch(in context: NSManagedObjectContext, configurationBlock: (NSFetchRequest<Self>) -> Void = { _ in }) -> [Self] {
+    static func fetch(
+        in context: NSManagedObjectContext,
+        configurationBlock: (
+            NSFetchRequest<Self>
+        ) -> Void = { _ in }
+    ) -> [Self] {
         let request = NSFetchRequest<Self>(entityName: Self.entityName)
         configurationBlock(request)
         // swiftlint:disable:next force_try
