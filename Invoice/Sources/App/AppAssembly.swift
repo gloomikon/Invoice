@@ -16,5 +16,15 @@ class AppAssembly: Assembly {
             RemoteConfigService(provider: FirebaseRemoteConfigProvider())
         }
         .inObjectScope(.container)
+
+        container.register(CoreDataStack.self) {
+            CoreDataStack()
+        }
+        .inObjectScope(.container)
+
+        container.register(DatabaseManager.self) {
+            DatabaseManager()
+        }
+        .inObjectScope(.container)
     }
 }
