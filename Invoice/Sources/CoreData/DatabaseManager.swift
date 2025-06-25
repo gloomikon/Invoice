@@ -77,7 +77,7 @@ private extension DatabaseManager {
             cacheName: "clients"
         )
         self.clientsFRC = frc
-        let stream = stream(for: frc)
+        let stream = FetchResultStream.make(for: frc)
         Task { @MainActor [weak self] in
             for await _ in stream {
                 guard let self else { return }
@@ -96,7 +96,7 @@ private extension DatabaseManager {
             cacheName: "businesses"
         )
         self.businessesFRC = frc
-        let stream = stream(for: frc)
+        let stream = FetchResultStream.make(for: frc)
         Task { @MainActor [weak self] in
             for await _ in stream {
                 guard let self else { return }
