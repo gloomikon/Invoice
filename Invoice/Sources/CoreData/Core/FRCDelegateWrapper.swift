@@ -2,30 +2,33 @@ import CoreData
 
 private var frcDelegates: [ObjectIdentifier: AnyObject] = [:]
 
-func stream<T: NSFetchRequestResult>(
-    for frc: NSFetchedResultsController<T>
-) -> AsyncStream<Void> {
-    AsyncStream { continuation in
-        let delegate = FRCDelegateWrapper {
-            continuation.yield()
-        }
+enum FetchResultStream {
 
-        frc.delegate = delegate
-        let key = ObjectIdentifier(frc)
-        frcDelegates[key] = delegate
+    static func make<T: NSFetchRequestResult>(
+        for frc: NSFetchedResultsController<T>
+    ) -> AsyncStream<Void> {
+        AsyncStream { continuation in
+            let delegate = FRCDelegateWrapper {
+                continuation.yield()
+            }
 
-        do {
-            try frc.performFetch()
-            continuation.yield()
-        } catch {
-            #if DEBUG
-            print("FRC fetch failed:", error)
-            #endif
-        }
+            frc.delegate = delegate
+            let key = ObjectIdentifier(frc)
+            frcDelegates[key] = delegate
 
-        continuation.onTermination = { _ in
-            frc.delegate = nil
-            frcDelegates.removeValue(forKey: key)
+            do {
+                try frc.performFetch()
+                continuation.yield()
+            } catch {
+                #if DEBUG
+                print("FRC fetch failed:", error)
+                #endif
+            }
+
+            continuation.onTermination = { _ in
+                frc.delegate = nil
+                frcDelegates.removeValue(forKey: key)
+            }
         }
     }
 }

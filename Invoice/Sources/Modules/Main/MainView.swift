@@ -6,39 +6,114 @@ struct MainView: View {
     @ObservedObject var databaseManager: DatabaseManager
 
     var body: some View {
-        List(databaseManager.clients) { client in
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("Name")
-                        .bold()
-                    Text(client.name)
+        TabView {
+            Clients()
+                .tabItem {
+                    Label("Clients", systemImage: "person.3")
                 }
-                HStack {
-                    Text("Email")
-                        .bold()
-                    Text(client.email?.email ?? "none")
+
+            Businesses()
+                .tabItem {
+                    Label("Businesses", systemImage: "building.2")
                 }
-                HStack {
-                    Text("Phone")
-                        .bold()
-                    Text(client.phone ?? "none")
+        }
+        .environmentObject(databaseManager)
+    }
+
+    private struct Clients: View {
+
+        @EnvironmentObject private var databaseManager: DatabaseManager
+
+        var body: some View {
+            List(databaseManager.clients) { client in
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text("Name")
+                            .bold()
+                        Text(client.name)
+                    }
+                    HStack {
+                        Text("Email")
+                            .bold()
+                        Text(client.email?.email ?? "none")
+                    }
+                    HStack {
+                        Text("Phone")
+                            .bold()
+                        Text(client.phone ?? "none")
+                    }
+                    HStack {
+                        Text("Address")
+                            .bold()
+                        Text(client.address ?? "none")
+                    }
                 }
-                HStack {
-                    Text("Address")
-                        .bold()
-                    Text(client.address ?? "none")
+            }
+            .animation(.easeInOut(duration: 0.2), value: databaseManager.clients)
+            .safeAreaInset(edge: .bottom) {
+                Button("Add client") {
+                    databaseManager.createClient(
+                        name: .randomName,
+                        email: Email(.randomEmail),
+                        phone: .randomPhone,
+                        address: .randomAddress
+                    )
                 }
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: databaseManager.clients)
-        .safeAreaInset(edge: .bottom) {
-            Button("Add client") {
-                databaseManager.createClient(
-                    name: .randomName,
-                    email: Email(.randomEmail),
-                    phone: .randomPhone,
-                    address: .randomAddress
-                )
+    }
+
+    private struct Businesses: View {
+
+        @EnvironmentObject private var databaseManager: DatabaseManager
+
+        var body: some View {
+            List(databaseManager.businesses) { business in
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text("Name")
+                            .bold()
+                        Text(business.name)
+                    }
+                    HStack {
+                        Text("Contact Name")
+                            .bold()
+                        Text(business.contactName ?? "none")
+                    }
+                    HStack {
+                        Text("Email")
+                            .bold()
+                        Text(business.contactEmail?.email ?? "none")
+                    }
+                    HStack {
+                        Text("Phone")
+                            .bold()
+                        Text(business.contactPhone ?? "none")
+                    }
+                    HStack {
+                        Text("Address")
+                            .bold()
+                        Text(business.contactAddress ?? "none")
+                    }
+                    HStack {
+                        Text("Logo")
+                            .bold()
+                        Text(business.logoURLString ?? "none")
+                    }
+                }
+            }
+            .animation(.easeInOut(duration: 0.2), value: databaseManager.businesses)
+            .safeAreaInset(edge: .bottom) {
+                Button("Add business") {
+                    databaseManager.createBusiness(
+                        name: .randomName,
+                        contactName: .randomName,
+                        contactEmail: Email(.randomEmail),
+                        contactPhone: .randomPhone,
+                        contactAddress: .randomAddress,
+                        logoURLString: nil
+                    )
+                }
             }
         }
     }
