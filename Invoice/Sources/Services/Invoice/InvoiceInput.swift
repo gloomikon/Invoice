@@ -84,5 +84,78 @@ extension InvoiceInput {
 
         let taxable: Bool
         let saveToCatalog: Bool
+
+        var amount: Double {
+            let totalPrice = price * quantity
+            let itemDiscount: Double
+            if let discount = discount {
+                switch discount {
+                case .fixed(let value):
+                    itemDiscount = value
+                case .percentage(let value):
+                    itemDiscount = totalPrice * (value / 100)
+                }
+            } else {
+                itemDiscount = 0
+            }
+            return totalPrice - itemDiscount
+        }
+    }
+}
+
+// MARK: - Totals
+
+extension InvoiceInput {
+
+    struct Totals {
+        var subtotal: Double = 0
+        var discountValue: Double = 0
+        var taxValue: Double = 0
+        var total: Double = 0
+    }
+
+    var totals: Totals {
+        var result = Totals()
+
+        workItems.forEach { result.subtotal += $0.amount }
+
+        // global discount
+        if let discount {
+            switch discount {
+            case .fixed(let value):
+                result.discountValue += value
+            case .percentage(let value):
+                result.discountValue += result.subtotal * (value / 100)
+            }
+        }
+
+        // tax
+        if let tax {
+            var taxableAmount = workItems
+                .filter { $0.taxable }
+                .map { $0.amount }
+                .reduce(0.0, +)
+
+            if let discount {
+                switch discount {
+                case .fixed(let value):
+                    taxableAmount -= value
+                case .percentage(let value):
+                    taxableAmount -= (result.subtotal * (value / 100))
+                }
+            }
+
+            switch tax {
+            case let .inclusive(value):
+                let taxRate = value / 100
+                result.taxValue = taxableAmount * (taxRate / (1 + taxRate))
+                result.total = result.subtotal - result.discountValue
+            case let .exclusive(value):
+                let exclusiveTaxValue = taxableAmount * (value / 100)
+                result.taxValue = exclusiveTaxValue
+                result.total = result.subtotal - result.discountValue + exclusiveTaxValue
+            }
+        }
+        return result
     }
 }
