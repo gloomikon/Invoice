@@ -202,7 +202,12 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
 
         for item in invoice.workItems {
             let hasDescription = item.description?.isEmpty == false
-            let rowHeight = hasDescription ? metrics.lineHeight * 2 : metrics.lineHeight
+            let hasDiscount = item.discount != nil
+
+            var rowsRequired: CGFloat = 1
+            if hasDescription { rowsRequired += 1 }
+            if hasDiscount { rowsRequired += 1 }
+            let rowHeight = rowsRequired * metrics.lineHeight
 
             currentY = beginPageIfNeeded(
                 context: context,
@@ -223,6 +228,24 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
                     description,
                     font: .systemFont(ofSize: 11),
                     at: CGPoint(x: x + 4, y: currentY + metrics.lineHeight),
+                    maxWidth: descriptionColumnWidth
+                )
+            }
+            if let discount = item.discount {
+                let discountTitle: String
+                switch discount {
+                case let .percentage(value):
+                    discountTitle = "Incl. \(value)% discount"
+                case let .fixed(amount):
+                    let discountAmount = currencyFormatter.string(from: NSNumber(value: amount)) ?? ""
+                    discountTitle = "Incl. \(discountAmount) Discount"
+                }
+
+                drawText(
+                    discountTitle,
+                    color: textColor.withAlphaComponent(0.6),
+                    font: .systemFont(ofSize: 11),
+                    at: CGPoint(x: x + 4, y: currentY + metrics.lineHeight * 2),
                     maxWidth: descriptionColumnWidth
                 )
             }
@@ -369,6 +392,7 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
     /// Draws text
     func drawText(
         _ text: String,
+        color: UIColor? = nil,
         font: UIFont = .systemFont(ofSize: 12),
         at point: CGPoint,
         align: NSTextAlignment = .left,
@@ -378,7 +402,7 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
         paragraph.alignment = align
 
         let attributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: textColor,
+            .foregroundColor: color ?? textColor,
             .font: font,
             .paragraphStyle: paragraph
         ]
