@@ -36,7 +36,15 @@ extension InvoiceInput {
         case exclusive(amount: Double)
     }
 
-    enum PaymentMethod {
+    enum PaymentMethod: CaseIterable {
+
+        static var allCases: [Self] {
+            [
+                .bankTransfer(accountHolderName: "", bankName: "", routingNumber: "", accountNumber: ""),
+                .payPal(email: "", link: nil)
+            ]
+        }
+
         case bankTransfer(
             accountHolderName: String,
             bankName: String,
@@ -44,13 +52,8 @@ extension InvoiceInput {
             accountNumber: String
         )
         case payPal(
-            link: String?,
-            email: String?
-        )
-        case check(
-            payeeName: String,
-            mailingAddress: String,
-            instructions: String?
+            email: String,
+            link: String?
         )
     }
 

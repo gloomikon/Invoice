@@ -386,7 +386,7 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
 
         // Notes
         drawText(
-            "NOTES & INSTRUCTIONS",
+            "NOTES",
             font: .boldSystemFont(ofSize: 10),
             at: CGPoint(x: metrics.margin, y: currentY),
             maxWidth: metrics.contentWidth
@@ -400,6 +400,99 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
                 at: CGPoint(x: metrics.margin, y: currentY),
                 maxWidth: metrics.contentWidth
             )
+        }
+
+        // Payment methods
+        if !invoice.paymentMethods.isEmpty {
+            currentY += metrics.lineHeight * 2
+
+            drawText(
+                "PAYMENT INSTRUCTIONS",
+                font: .boldSystemFont(ofSize: 10),
+                at: CGPoint(x: metrics.margin, y: currentY),
+                maxWidth: metrics.contentWidth
+            )
+            currentY += metrics.lineHeight
+
+            let allMethodsCount = CGFloat(InvoiceInput.PaymentMethod.allCases.count)
+            let itemPadding = metrics.margin
+            let itemWidth = (metrics.contentWidth - (itemPadding * (allMethodsCount - 1))) / allMethodsCount
+
+            var x: CGFloat = metrics.margin
+            invoice.paymentMethods.forEach { method in
+                switch method {
+                case let .bankTransfer(accountHolderName, bankName, routingNumber, accountNumber):
+                    var y = currentY
+                    self.drawText(
+                        "Bank transfer",
+                        font: .boldSystemFont(ofSize: 12),
+                        at: CGPoint(x: x, y: y),
+                        maxWidth: itemWidth
+                    )
+                    y += self.metrics.lineHeight
+
+                    self.drawText(
+                        "Account Holder: \(accountHolderName)",
+                        at: CGPoint(x: x, y: y),
+                        maxWidth: itemWidth
+                    )
+                    y += self.metrics.lineHeight
+
+                    self.drawText(
+                        "Bank name: \(bankName)",
+                        at: CGPoint(x: x, y: y),
+                        maxWidth: itemWidth
+                    )
+                    y += self.metrics.lineHeight
+
+                    self.drawText(
+                        "Bank name: \(bankName)",
+                        at: CGPoint(x: x, y: y),
+                        maxWidth: itemWidth
+                    )
+                    y += self.metrics.lineHeight
+
+                    self.drawText(
+                        "Routing number: \(routingNumber)",
+                        at: CGPoint(x: x, y: y),
+                        maxWidth: itemWidth
+                    )
+                    y += self.metrics.lineHeight
+
+                    self.drawText(
+                        "Account number: \(accountNumber)",
+                        at: CGPoint(x: x, y: y),
+                        maxWidth: itemWidth
+                    )
+
+                case let .payPal(email, link):
+                    var y = currentY
+                    self.drawText(
+                        "Pay Pal",
+                        font: .boldSystemFont(ofSize: 12),
+                        at: CGPoint(x: x, y: y),
+                        maxWidth: itemWidth
+                    )
+                    y += self.metrics.lineHeight
+
+                    self.drawText(
+                        "email: \(email)",
+                        at: CGPoint(x: x, y: y),
+                        maxWidth: itemWidth
+                    )
+
+                    if let link {
+                        y += self.metrics.lineHeight
+                        self.drawText(
+                            "PayPal.Me: \(link)",
+                            at: CGPoint(x: x, y: y),
+                            maxWidth: itemWidth
+                        )
+                    }
+                }
+                x += itemWidth + itemPadding
+            }
+
         }
 
         //  Footer for last page
@@ -736,7 +829,18 @@ enum InputMock {
             currency: .init(code: "403", symbol: "$"),
             discount: .percentage(amount: 5),
             tax: .exclusive(amount: 10),
-            paymentMethods: [.payPal(link: "paypalme", email: "someLink@paypal.com")],
+            paymentMethods: [
+                .bankTransfer(
+                    accountHolderName: "Sam Porter",
+                    bankName: "Wells Fargo",
+                    routingNumber: "121000248",
+                    accountNumber: "18763223"
+                ),
+                .payPal(
+                    email: "someLink@paypal.com",
+                    link: "paypalme.link"
+                )
+            ],
             signature: .icSignatureExample,
             notes: "Best regards and thank you!"
         )
