@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 struct InvoiceInput {
 
@@ -17,7 +18,7 @@ struct InvoiceInput {
     let tax: TaxType?
 
     let paymentMethods: [PaymentMethod]
-    let signature: ImageResource?
+    let signature: UIImage?
     let notes: String?
 }
 

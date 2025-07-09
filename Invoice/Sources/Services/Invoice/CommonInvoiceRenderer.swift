@@ -253,7 +253,7 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
 
             // Quantity
             drawText(
-                String(format: "%.2f", item.quantity),
+                String(format: "%.1f", item.quantity),
                 at: CGPoint(x: x - 4, y: currentY),
                 align: .right,
                 maxWidth: quantityColumnWidth
@@ -368,6 +368,34 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             context: context.cgContext
         )
 
+        // Signature
+        if let signature = invoice.signature {
+            let maxWidth: CGFloat = 140
+            let maxHeight: CGFloat = 70
+
+            let signatureSize = signature.size
+            let aspectRatio = signatureSize.width / signatureSize.height
+
+            var renderWidth = maxWidth
+            var renderHeight = renderWidth / aspectRatio
+
+            if renderHeight > maxHeight {
+                renderHeight = maxHeight
+                renderWidth = renderHeight * aspectRatio
+            }
+
+            currentY += metrics.lineHeight
+            drawImage(
+                signature,
+                at: CGPoint(
+                    x: metrics.pageWidth - metrics.margin - amountColumnWidth - renderWidth / 2,
+                    y: currentY
+                ),
+                size: .init(width: renderWidth, height: renderHeight)
+            )
+            currentY += renderHeight
+        }
+
         //  Footer for last page
         drawFooter(in: context.cgContext)
     }
@@ -418,6 +446,20 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             attributes: attributes,
             context: nil
         )
+    }
+
+    // Draw image
+    func drawImage(
+        _ image: UIImage,
+        at point: CGPoint,
+        size: CGSize
+    ) {
+        image.draw(in: CGRect(
+            x: point.x,
+            y: point.y,
+            width: size.width,
+            height: size.height
+        ))
     }
 
     /// Draws party
@@ -647,7 +689,7 @@ enum InputMock {
             discount: .percentage(amount: 5),
             tax: .exclusive(amount: 10),
             paymentMethods: [.payPal(link: "paypalme", email: "someLink@paypal.com")],
-            signature: nil,
+            signature: .icSignatureExample,
             notes: "Best regards and thank you!"
         )
     }
