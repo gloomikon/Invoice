@@ -385,26 +385,33 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
         }
 
         // Notes
-        drawText(
-            "NOTES",
-            font: .boldSystemFont(ofSize: 10),
-            at: CGPoint(x: metrics.margin, y: currentY),
-            maxWidth: metrics.contentWidth
-        )
-
         if let notes = invoice.notes {
+            drawText(
+                "NOTES",
+                font: .boldSystemFont(ofSize: 10),
+                at: CGPoint(x: metrics.margin, y: currentY),
+                maxWidth: metrics.contentWidth
+            )
             currentY += metrics.lineHeight
+
             drawText(
                 notes,
                 font: .systemFont(ofSize: 10),
                 at: CGPoint(x: metrics.margin, y: currentY),
                 maxWidth: metrics.contentWidth
             )
+            currentY += metrics.lineHeight
         }
 
         // Payment methods
         if !invoice.paymentMethods.isEmpty {
-            currentY += metrics.lineHeight * 2
+            currentY += metrics.lineHeight
+            drawSeparator(
+                in: context.cgContext,
+                at: CGPoint(x: metrics.margin, y: currentY),
+                width: metrics.contentWidth
+            )
+            currentY += metrics.lineHeight
 
             drawText(
                 "PAYMENT INSTRUCTIONS",
@@ -412,7 +419,7 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
                 at: CGPoint(x: metrics.margin, y: currentY),
                 maxWidth: metrics.contentWidth
             )
-            currentY += metrics.lineHeight
+            currentY += metrics.lineHeight * 2
 
             let allMethodsCount = CGFloat(InvoiceInput.PaymentMethod.allCases.count)
             let itemPadding = metrics.margin
@@ -778,6 +785,19 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             font: .systemFont(ofSize: 10),
             at: CGPoint(x: x, y: y)
         )
+    }
+
+    func drawSeparator(
+        in context: CGContext,
+        at point: CGPoint,
+        width: CGFloat
+    ) {
+        context.setStrokeColor(tableBorderColor.withAlphaComponent(0.5).cgColor)
+        context.setLineWidth(0.5)
+
+        context.move(to: point)
+        context.addLine(to: CGPoint(x: point.x + width, y: point.y))
+        context.strokePath()
     }
 }
 
