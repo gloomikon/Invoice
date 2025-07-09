@@ -370,30 +370,16 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
 
         // Signature
         if let signature = invoice.signature {
-            let maxWidth: CGFloat = 140
-            let maxHeight: CGFloat = 70
-
-            let signatureSize = signature.size
-            let aspectRatio = signatureSize.width / signatureSize.height
-
-            var renderWidth = maxWidth
-            var renderHeight = renderWidth / aspectRatio
-
-            if renderHeight > maxHeight {
-                renderHeight = maxHeight
-                renderWidth = renderHeight * aspectRatio
-            }
-
             currentY += metrics.lineHeight
-            drawImage(
+            drawSignature(
                 signature,
                 at: CGPoint(
-                    x: metrics.pageWidth - metrics.margin - amountColumnWidth - renderWidth / 2,
+                    x: metrics.pageWidth - metrics.margin - amountColumnWidth,
                     y: currentY
                 ),
-                size: .init(width: renderWidth, height: renderHeight)
+                currentY: &currentY,
+                context: context.cgContext
             )
-            currentY += renderHeight
         } else {
             currentY += metrics.lineHeight * 3
         }
@@ -585,6 +571,48 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
 
         context.strokePath()
         currentY += metrics.lineHeight
+    }
+
+    /// Draws signature
+    func drawSignature(
+        _ signature: UIImage,
+        at point: CGPoint,
+        currentY: inout CGFloat,
+        context: CGContext
+    ) {
+        let maxWidth: CGFloat = 140
+        let maxHeight: CGFloat = 70
+
+        let signatureSize = signature.size
+        let aspectRatio = signatureSize.width / signatureSize.height
+
+        var renderWidth = maxWidth
+        var renderHeight = renderWidth / aspectRatio
+
+        if renderHeight > maxHeight {
+            renderHeight = maxHeight
+            renderWidth = renderHeight * aspectRatio
+        }
+
+        let x = point.x - renderWidth / 2
+        drawImage(
+            signature,
+            at: CGPoint(
+                x: x,
+                y: point.y
+            ),
+            size: .init(width: renderWidth, height: renderHeight)
+        )
+
+        context.setStrokeColor(tableBorderColor.withAlphaComponent(0.5).cgColor)
+        context.setLineWidth(0.5)
+
+        let lineY = currentY + renderHeight + 2
+        context.move(to: CGPoint(x: x, y: lineY))
+        context.addLine(to: CGPoint(x: x + renderWidth, y: lineY))
+
+        context.strokePath()
+        currentY += renderHeight
     }
 
     /// Draws table header
