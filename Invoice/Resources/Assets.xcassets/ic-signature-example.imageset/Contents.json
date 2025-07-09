@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "ic-signature-example.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
