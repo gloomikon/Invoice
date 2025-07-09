@@ -394,6 +394,26 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
                 size: .init(width: renderWidth, height: renderHeight)
             )
             currentY += renderHeight
+        } else {
+            currentY += metrics.lineHeight * 3
+        }
+
+        // Notes
+        drawText(
+            "NOTES & INSTRUCTIONS",
+            font: .boldSystemFont(ofSize: 10),
+            at: CGPoint(x: metrics.margin, y: currentY),
+            maxWidth: metrics.contentWidth
+        )
+
+        if let notes = invoice.notes {
+            currentY += metrics.lineHeight
+            drawText(
+                notes,
+                font: .systemFont(ofSize: 10),
+                at: CGPoint(x: metrics.margin, y: currentY),
+                maxWidth: metrics.contentWidth
+            )
         }
 
         //  Footer for last page
