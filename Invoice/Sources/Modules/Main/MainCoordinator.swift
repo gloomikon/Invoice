@@ -15,7 +15,7 @@ class MainCoordinator: NavigationCoordinator<MainRoute> {
         switch route {
         case .main:
             let module = MainModule(router: self)
-            return .set(module)
+            return .set(module.build())
         }
     }
 }

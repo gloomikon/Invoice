@@ -1,4 +1,5 @@
 import Depin
+import FoundationExt
 
 class AppAssembly: Assembly {
 
@@ -24,6 +25,11 @@ class AppAssembly: Assembly {
 
         container.register(DatabaseManager.self) {
             DatabaseManager()
+        }
+        .inObjectScope(.container)
+
+        container.register(NetworkStatusService.self) {
+            NetworkStatusService()
         }
         .inObjectScope(.container)
     }

@@ -1,4 +1,4 @@
-protocol Paywall: Module {
+@MainActor protocol Paywall: Module {
     /// Analytics name of the paywall
     static var name: String { get }
 

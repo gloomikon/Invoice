@@ -25,7 +25,8 @@ class AppWindow: DebugPanelWindow {
 
             Group("📑 Logs") {
                 SimpleLogsSetting("Amplitude", logger: .app)
-                // NetworkLogsSetting("Networking", logger: .app)
+//                 NetworkLogsSetting("Networking", logger: .app)
+                AdvancedLogsSetting("Debug", logger: .app)
             }
 
             Group("🦊 Firebase") {

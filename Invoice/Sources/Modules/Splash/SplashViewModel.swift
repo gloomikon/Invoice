@@ -1,14 +1,22 @@
 import CombineExt
 import Core
+import DebugPanel
 import Depin
+import FoundationExt
 import UIKit
 
+@MainActor
 class SplashViewModel: ObservableObject {
 
     // MARK: - Injected properties
 
     @Injected private var startupService: StartupService
+    @Injected private var networkStatusService: NetworkStatusService
     private let router: SplashRouter
+
+    @Published var showNoInternetConnection = false
+
+    private var internetIsActive = true
 
     // MARK: - Private properties
 
@@ -25,16 +33,37 @@ class SplashViewModel: ObservableObject {
                 Task { await self?.start() }
             }
             .store(in: &bag)
+
+        let stream = networkStatusService.statusStream()
+        Task { [weak self] in
+            for await status in stream {
+                guard let self else { return }
+                AdvancedLogger.app.log(AdvancedLog(message: "\(status)", issuer: "status"))
+                internetIsActive = status.isConnected
+            }
+        }
     }
 
     private func start() async {
-        await ATTManager.requestAuthorization()
-        await startupService.start()
-        await openNextScreen()
+        await AdjustATTManager.requestAuthorization()
+
+        if internetIsActive {
+            await startupService.start()
+            openNextScreen()
+        } else {
+            showNoInternetConnection = true
+        }
     }
 
-    @MainActor
-    private func openNextScreen() async {
-        router.openOnboardingFromSplash()
+    private func openNextScreen() {
+        SplashStrategy().route(using: router)
+    }
+
+    func tryAgain() {
+        showNoInternetConnection = false
+        Task {
+            try? await Task.sleep(for: .seconds(0.5))
+            await start()
+        }
     }
 }

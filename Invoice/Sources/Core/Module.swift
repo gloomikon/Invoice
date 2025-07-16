@@ -1,17 +1,12 @@
 import UIKit
 import XCoordinator
 
-protocol Module: Presentable {
+@MainActor protocol Module {
 
     func build() -> UIViewController
 }
 
-extension Module {
-    var viewController: UIViewController! {
-        build()
-    }
-}
-
+@MainActor
 class ModuleBuilder {
 
     func build(_ module: Module) -> UIViewController {
