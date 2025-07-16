@@ -389,13 +389,14 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             )
             currentY += metrics.lineHeight
 
-            drawText(
+            let notesHeight = drawText(
                 notes,
                 font: .systemFont(ofSize: 10),
                 at: CGPoint(x: metrics.margin, y: currentY),
-                maxWidth: metrics.contentWidth
+                maxWidth: metrics.contentWidth,
+                verticalPadding: 2
             )
-            currentY += metrics.lineHeight
+            currentY += notesHeight
         }
 
         // Payment methods
