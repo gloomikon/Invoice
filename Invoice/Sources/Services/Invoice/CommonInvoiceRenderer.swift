@@ -201,35 +201,28 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
         let amountColumnWidth = Column.amount.width(with: metrics)
 
         for item in invoice.workItems {
-            let hasDescription = item.description?.isEmpty == false
-            let hasDiscount = item.discount != nil
-
-            var rowsRequired: CGFloat = 1
-            if hasDescription { rowsRequired += 1 }
-            if hasDiscount { rowsRequired += 1 }
-            let rowHeight = rowsRequired * metrics.lineHeight
-
-            currentY = beginPageIfNeeded(
-                context: context,
-                currentY: currentY,
-                requiredSpace: rowHeight
-            )
+            var y = currentY
             var x = metrics.margin
 
             // Description (+ optional note)
-            drawText(
+            let nameHeight = drawText(
                 item.name,
                 font: .boldSystemFont(ofSize: 12),
-                at: CGPoint(x: x + 4, y: currentY),
-                maxWidth: descriptionColumnWidth
+                at: CGPoint(x: x + 4, y: y),
+                maxWidth: descriptionColumnWidth,
+                verticalPadding: 2
             )
+            y += nameHeight
+
             if let description = item.description, !description.isEmpty {
-                drawText(
+                let descriptionHeight = drawText(
                     description,
                     font: .systemFont(ofSize: 11),
-                    at: CGPoint(x: x + 4, y: currentY + metrics.lineHeight),
-                    maxWidth: descriptionColumnWidth
+                    at: CGPoint(x: x + 4, y: y),
+                    maxWidth: descriptionColumnWidth,
+                    verticalPadding: 2
                 )
+                y += descriptionHeight
             }
             if let discount = item.discount {
                 let discountTitle: String
@@ -245,9 +238,10 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
                     discountTitle,
                     color: textColor.withAlphaComponent(0.6),
                     font: .systemFont(ofSize: 11),
-                    at: CGPoint(x: x + 4, y: currentY + metrics.lineHeight * 2),
+                    at: CGPoint(x: x + 4, y: y),
                     maxWidth: descriptionColumnWidth
                 )
+                y += metrics.lineHeight
             }
             x += descriptionColumnWidth
 
@@ -288,8 +282,8 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             cgContext.addLine(to: CGPoint(x: metrics.pageWidth - metrics.margin, y: currentY))
 
             // Bottom border
-            cgContext.move(to: CGPoint(x: metrics.margin, y: currentY + rowHeight))
-            cgContext.addLine(to: CGPoint(x: metrics.pageWidth - metrics.margin, y: currentY + rowHeight))
+            cgContext.move(to: CGPoint(x: metrics.margin, y: y))
+            cgContext.addLine(to: CGPoint(x: metrics.pageWidth - metrics.margin, y: y))
 
             // Vertical column lines
             x = metrics.margin
@@ -297,13 +291,14 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
                 .map { $0.width(with: self.metrics) }
                 .forEach { width in
                 cgContext.move(to: CGPoint(x: x, y: currentY))
-                cgContext.addLine(to: CGPoint(x: x, y: currentY + rowHeight))
+                cgContext.addLine(to: CGPoint(x: x, y: y))
                 x += width
             }
             cgContext.move(to: CGPoint(x: x, y: currentY))
-            cgContext.addLine(to: CGPoint(x: x, y: currentY + rowHeight))
+            cgContext.addLine(to: CGPoint(x: x, y: y))
 
             cgContext.strokePath()
+            let rowHeight = y - currentY
             currentY += rowHeight
         }
 
@@ -524,14 +519,16 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
     }
 
     /// Draws text
+    @discardableResult
     func drawText(
         _ text: String,
         color: UIColor? = nil,
         font: UIFont = .systemFont(ofSize: 12),
         at point: CGPoint,
         align: NSTextAlignment = .left,
-        maxWidth: CGFloat = .greatestFiniteMagnitude
-    ) {
+        maxWidth: CGFloat = .greatestFiniteMagnitude,
+        verticalPadding: CGFloat = 0
+    ) -> CGFloat {
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = align
 
@@ -541,17 +538,30 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             .paragraphStyle: paragraph
         ]
 
-        let rect = CGRect(
-            origin: point,
-            size: CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
+        let constraintSize = CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
+        let boundingRect = (text as NSString).boundingRect(
+            with: constraintSize,
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: attributes,
+            context: nil
+        )
+
+        let renderingHeight = boundingRect.height
+        let drawingRect = CGRect(
+            x: point.x,
+            y: point.y + verticalPadding,
+            width: maxWidth,
+            height: renderingHeight + verticalPadding
         )
 
         text.draw(
-            with: rect,
+            with: drawingRect,
             options: .usesLineFragmentOrigin,
             attributes: attributes,
             context: nil
         )
+
+        return renderingHeight + verticalPadding * 2
     }
 
     // Draw image
@@ -827,7 +837,7 @@ enum InputMock {
             workItems: [
                 .init(
                     name: "Some Work",
-                    description: "Some work finished some time ago",
+                    description: "Some work finished some time ago \nand some additional work too",
                     price: 500,
                     quantity: 2,
                     unitType: .item,
@@ -836,7 +846,7 @@ enum InputMock {
                     saveToCatalog: true
                 ),
                 .init(
-                    name: "Some Work 2",
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
                     description: "Some work finished some time ago too",
                     price: 100,
                     quantity: 9,
