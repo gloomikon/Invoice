@@ -21,11 +21,11 @@ class AppCoordinator: NavigationCoordinator<AppRoute> {
 
         case .splash:
             let module = SplashModule(router: self)
-            return .set(module)
+            return .set(module.build())
 
         case .onboarding:
             let module = OnboardingModule(router: self)
-            return .set(module, animation: .fade)
+            return .set(module.build(), animation: .fade)
 
         case .paywall:
             return .none(PaywallCoordinator(rootViewController: rootViewController, paywallTrigger: .onboarding))
@@ -40,8 +40,12 @@ class AppCoordinator: NavigationCoordinator<AppRoute> {
 
 extension AppCoordinator: SplashRouter {
 
-    func openOnboardingFromSplash() {
+    func openIntroFromSplash() {
         trigger(.onboarding)
+    }
+
+    func openHome() {
+        trigger(.main)
     }
 }
 

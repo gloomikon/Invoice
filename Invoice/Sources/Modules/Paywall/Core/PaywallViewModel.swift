@@ -1,6 +1,6 @@
 import Combine
 
-protocol PaywallViewModel: ObservableObject {
+@MainActor protocol PaywallViewModel: ObservableObject {
 
     var buttonTitle: String { get }
     var crossVisible: Bool { get }

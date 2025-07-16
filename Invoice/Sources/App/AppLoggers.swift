@@ -9,3 +9,7 @@ extension SimpleLogger {
 extension NetworkLogger {
     static let app = NetworkLogger()
 }
+
+extension AdvancedLogger {
+    static let app = AdvancedLogger()
+}

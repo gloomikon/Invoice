@@ -4,11 +4,11 @@ struct PrimaryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 18, weight: .semibold))
+            .font(.system(size: 18, weight: .semibold)) // TODO: - Fix font
             .frame(maxWidth: .infinity)
             .frame(height: 56)
-            .background(.pink, in: .capsule)
-            .foregroundStyle(.brown)
+            .background(.linkedIn, in: .capsule)
+            .foregroundStyle(.white)
     }
 }
 

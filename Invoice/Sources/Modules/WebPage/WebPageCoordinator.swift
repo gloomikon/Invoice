@@ -25,7 +25,7 @@ class WebPageCoordinator: NavigationCoordinator<WebPageRoute> {
                 url: url,
                 title: title
             )
-            return .push(module)
+            return .push(module.build())
 
         case .pop:
             return .pop()

@@ -28,7 +28,7 @@ class PaywallCoordinator: NavigationCoordinator<PaywallRoute> {
 
         case .paywall:
             let module = PaywallModule(router: self)
-            return .present(module, modalPresentationStyle: .fullScreen, animation: .fade)
+            return .present(module.build(), modalPresentationStyle: .fullScreen, animation: .fade)
 
         case .privacyPolicy:
             guard let navController = rootViewController.presentedViewController as? UINavigationController else {

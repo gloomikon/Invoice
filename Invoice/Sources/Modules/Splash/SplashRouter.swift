@@ -1,4 +1,5 @@
 protocol SplashRouter {
 
-    func openOnboardingFromSplash()
+    func openIntroFromSplash()
+    func openHome()
 }
