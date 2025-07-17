@@ -4,7 +4,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 18, weight: .semibold)) // TODO: - Fix font
+            .font(.poppins(size: 16, weight: .semiBold))
             .frame(maxWidth: .infinity)
             .frame(height: 56)
             .background(.linkedIn, in: .capsule)

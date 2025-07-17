@@ -11,8 +11,8 @@ class AppStorage {
     @Storage("didLaunchApp", default: false)
     var didLaunchApp
 
-    @Storage("didSeePaywall", default: false)
-    var didSeePaywall
+    @Storage("didSeeMain", default: false)
+    var didSeeMain
 
     private var realIsPremium = false
 

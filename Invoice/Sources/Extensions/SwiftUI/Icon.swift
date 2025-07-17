@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct RImage: View {
+struct Icon: View {
 
     private let image: Image
 

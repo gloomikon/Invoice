@@ -53,7 +53,7 @@ extension AppCoordinator: SplashRouter {
 
 extension AppCoordinator: OnboardingRouter {
 
-    func openPaywallFromOnboarding() {
-        trigger(.paywall)
+    func openMainFromOnboarding() {
+        trigger(.main)
     }
 }

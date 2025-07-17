@@ -35,7 +35,6 @@ class BasePaywallViewModel: PaywallViewModel {
 
         PaywallEvent.paywallShown(name: paywall.name)
             .send()
-        appStorage.didSeePaywall = true
 
         bind()
         fetchPackages()

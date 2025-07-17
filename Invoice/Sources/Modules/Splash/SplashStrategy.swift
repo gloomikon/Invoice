@@ -8,7 +8,7 @@ struct SplashStrategy {
     func route(using router: SplashRouter) {
         if appStorage.isPremium {
             router.openHome()
-        } else if appStorage.didSeePaywall {
+        } else if appStorage.didSeeMain {
             router.openHome()
         } else {
             router.openIntroFromSplash()
