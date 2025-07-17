@@ -1,4 +1,4 @@
 protocol OnboardingRouter {
 
-    func openPaywallFromOnboarding()
+    func openMainFromOnboarding()
 }

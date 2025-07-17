@@ -7,11 +7,18 @@ class OnboardingViewModel: ObservableObject {
 
     private let router: OnboardingRouter
 
+    @Published private(set) var page = 0
+
     init(router: OnboardingRouter) {
         self.router = router
     }
 
-    func openPaywall() {
-        router.openPaywallFromOnboarding()
+    func openNextPage() {
+        if 0...1 ~= page {
+            page += 1
+            // TODO: - Ask for push, ask for rating
+        } else {
+            router.openMainFromOnboarding()
+        }
     }
 }
