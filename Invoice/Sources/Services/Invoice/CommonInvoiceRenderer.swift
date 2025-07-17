@@ -50,7 +50,7 @@ class CommonInvoiceRenderer: InvoiceRenderable {
             headersFillColor: headersFillColor
         )
 
-        return renderer.pdfData(actions: renderer.renderingActions)
+        return renderer.render()
     }
 }
 
@@ -95,7 +95,7 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
     let headersFillColor: UIColor
 
     private lazy var totals = invoice.totals
-    private var currentPageIndex = 0
+    private var renderableHeight: CGFloat = 0
 
     init(
         invoice: InvoiceInput,
@@ -125,12 +125,26 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
         )
     }
 
-    lazy var renderingActions: ((UIGraphicsPDFRendererContext) -> Void) = { [weak self] context in
+    func render() -> Data {
+        renderingActions(UIGraphicsPDFRendererContext())
+
+        let renderer = UIGraphicsPDFRenderer(
+            bounds: CGRect(
+                origin: .zero,
+                size: CGSize(
+                    width: metrics.pageWidth,
+                    height: renderableHeight
+                )
+            )
+        )
+        return renderer.pdfData(actions: renderingActions)
+    }
+
+    private lazy var renderingActions: ((UIGraphicsPDFRendererContext) -> Void) = { [weak self] context in
         guard let self else { return }
 
         // Begin First Page
         context.beginPage()
-        currentPageIndex = 0
         let interBlockSpacing: CGFloat = 18
         var currentY = metrics.margin
 
@@ -524,25 +538,8 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             currentY += maxBlockHeight
         }
 
-        //  Footer for last page
-        drawFooter(in: context.cgContext)
-    }
-
-    /// Starts a new page and draws footer for previous one and repeating header for new one.
-    func beginPageIfNeeded(
-        context: UIGraphicsPDFRendererContext,
-        currentY: CGFloat,
-        requiredSpace: CGFloat
-    ) -> CGFloat {
-        var y = currentY
-        if y + requiredSpace > metrics.pageHeight - metrics.bottomMargin {
-            drawFooter(in: context.cgContext)
-            context.beginPage()
-            currentPageIndex += 1
-            y = metrics.margin
-            drawTableHeader(in: context.cgContext, y: &y) // repeat table headers
-        }
-        return y
+        // Set global renderable page heoght
+        renderableHeight = currentY + metrics.bottomMargin
     }
 
     /// Draws text
@@ -817,19 +814,6 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
         y += headerHeight
     }
 
-    /// Draws page footer
-    func drawFooter(in context: CGContext) {
-        let footerText = "Invoice #\(invoice.number) Page \(currentPageIndex + 1)"
-        let size = footerText.size(withAttributes: [.font: UIFont.systemFont(ofSize: 10)])
-        let x = metrics.margin
-        let y = metrics.pageHeight - metrics.bottomMargin + (metrics.bottomMargin - size.height) / 2
-        drawText(
-            footerText,
-            font: .systemFont(ofSize: 10),
-            at: CGPoint(x: x, y: y)
-        )
-    }
-
     func drawSeparator(
         in context: CGContext,
         at point: CGPoint,
@@ -875,6 +859,256 @@ enum InputMock {
                     quantity: 2,
                     unitType: .item,
                     discount: .percentage(amount: 10),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
+                    taxable: true,
+                    saveToCatalog: true
+                ),
+                .init(
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
+                    description: "Some work finished some time ago too",
+                    price: 100,
+                    quantity: 9,
+                    unitType: .hour,
+                    discount: .fixed(amount: 50),
                     taxable: true,
                     saveToCatalog: true
                 ),
