@@ -22,10 +22,15 @@ struct MainView: View {
         VStack(spacing: 14) {
             header
                 .padding(.horizontal, 16)
-            if viewModel.invoices.isEmpty {
+            if viewModel.allInvoices.isEmpty {
                 EmptyStateView()
             } else {
-
+                ListView(
+                    total: viewModel.total,
+                    invoices: viewModel.invoices,
+                    paidStatus: $viewModel.paidStatus
+                )
+                .padding(.horizontal, 16)
             }
         }
         .padding(.top, 12)
@@ -52,6 +57,73 @@ struct MainView: View {
 }
 
 private extension MainView {
+
+    struct ListView: View {
+
+        let total: String
+        let invoices: [Invoice]
+        @Binding var paidStatus: Invoice.PaidStatus?
+
+        var body: some View {
+            VStack(spacing: 28) {
+                Picker("", selection: $paidStatus) {
+                    Text("All")
+                        .font(.poppins(size: 13, weight: .medium))
+                        .foregroundStyle(.red)
+                        .tag(Optional<Invoice.PaidStatus>.none)
+                    Text("Paid")
+                        .tag(Invoice.PaidStatus.paid)
+                    Text("Unpaid")
+                        .tag(Invoice.PaidStatus.unpaid)
+                }
+                .pickerStyle(.segmented)
+                .colorScheme(.light)
+            }
+
+            if let paidStatus, invoices.isEmpty {
+                let text: LocalizedStringKey = switch paidStatus {
+                case .unpaid:
+                    "Zero unpaid — that’s a win"
+                case .paid:
+                    "No paid invoices so far"
+                }
+                EmptyStateView(text: text)
+            } else {
+                Text("Total: \(total)")
+                    .font(.poppins(size: 14, weight: .medium))
+                    .foregroundStyle(.textSecondary)
+                    .padding(.top, 20)
+
+                List(invoices) { invoice in
+                    invoice
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                }
+                .listStyle(.plain)
+                .listRowSpacing(8)
+            }
+        }
+
+        private struct EmptyStateView: View {
+
+            let text: LocalizedStringKey
+
+            var body: some View {
+
+                VStack(spacing: 12) {
+                    Icon(systemName: "doc.viewfinder")
+                        .scaledToFit()
+                        .frame(width: 40)
+
+                    Text(text)
+                        .font(.poppins(size: 16, weight: .medium))
+                }
+                .foregroundStyle(.linkedIn.opacity(0.6))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+    }
 
     struct EmptyStateView: View {
 
@@ -158,8 +230,8 @@ private extension MainView {
                             $0[VerticalAlignment.center] - 112 * proportion
                         }
 
-                    Text("Start by creating invoice.\nLook professional to your clients")
-                        .font(.poppins(size: 14, weight: .medium))
+                    Text("No invoices to show.\nHit the button and create one!")
+                        .font(.poppins(size: 16, weight: .medium))
                         .foregroundStyle(.linkedIn.opacity(0.6))
                         .alignmentGuide(VerticalAlignment.center) {
                             $0[VerticalAlignment.center] - 200 * proportion
@@ -170,6 +242,54 @@ private extension MainView {
                 .offset(x: -offset)
             }
         }
+    }
+}
+
+extension Invoice: View {
+
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack(alignment: .top, spacing: 8) {
+                Text(title)
+                    .font(.poppins(size: 16, weight: .semiBold))
+                    .foregroundStyle(.textPrimary)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Text(formattedAmount)
+                    .font(.poppins(size: 16, weight: .medium))
+                    .foregroundStyle(.textPrimary)
+            }
+
+            HStack(spacing: 8) {
+                Text(date.formatted(.dateTime.day().month(.abbreviated)))
+                    .font(.poppins(size: 14))
+                    .foregroundStyle(.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Text("due \(dueDays)d")
+                    .font(.poppins(size: 14))
+                    .foregroundStyle(.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+        }
+        .padding(16)
+        .background(.white, in: .rect(cornerRadius: 10))
+    }
+
+    private static let amountFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 2
+        formatter.locale = Locale.current
+        return formatter
+    }()
+
+    var formattedAmount: String {
+        let formatter = Self.amountFormatter
+        formatter.currencySymbol = currency.symbol
+        return formatter.string(from: NSNumber(value: sum)) ?? "\(sum)\(currency.symbol)"
     }
 
 }
