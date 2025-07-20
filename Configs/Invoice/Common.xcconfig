@@ -2,18 +2,18 @@
 
 ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
 CODE_SIGN_IDENTITY = Apple Development
-CODE_SIGN_STYLE = Automatic
+CODE_SIGN_STYLE = Manual
 CODE_SIGN_ENTITLEMENTS = Invoice/Invoice.entitlements
 CURRENT_PROJECT_VERSION = 1
 GENERATE_INFOPLIST_FILE = YES
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
-INFOPLIST_FILE = Pythagoras/Resources/Info.plist
+INFOPLIST_FILE = Invoice/Resources/Info.plist
 INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES
 INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen
 INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait
 LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks
-PRODUCT_BUNDLE_IDENTIFIER = com.gloomikon.invoice
-//DEVELOPMENT_TEAM = WGGBM25LU6
+PRODUCT_BUNDLE_IDENTIFIER = com.dmytroyashchenko.invoiceapp
+DEVELOPMENT_TEAM = MTR95823HL
 PRODUCT_NAME = Invoice Maker
 SWIFT_EMIT_LOC_STRINGS = YES
 SWIFT_VERSION = 5.0
