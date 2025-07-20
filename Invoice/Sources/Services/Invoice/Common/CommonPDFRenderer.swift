@@ -2,45 +2,7 @@ import PDFKit
 import SwiftUI
 import UIKit
 
-protocol InvoiceRenderable {
-
-    func render(from input: InvoiceInput) -> Data
-}
-
-class CommonInvoiceRenderer: InvoiceRenderable {
-
-    func render(from invoice: InvoiceInput) -> Data {
-        let renderer = CommonPDFRenderer(
-            invoice: invoice,
-            metrics: InvoicePageMetrics(
-                pageFormat: .usLetter,
-                margin: 36,
-                lineHeight: 18,
-                bottomMargin: 48
-            ),
-            currencyFormatter: {
-                let numberFormatter = NumberFormatter()
-                numberFormatter.numberStyle = .currency
-                numberFormatter.currencyCode = invoice.currency.code
-                numberFormatter.currencySymbol = invoice.currency.symbol
-                numberFormatter.maximumFractionDigits = 2
-                return numberFormatter
-            }(),
-            dateFormatter: {
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateStyle = .medium
-                return dateFormatter
-            }(),
-            textColor: .black,
-            tableBorderColor: .black,
-            headersFillColor: .systemGray6
-        )
-
-        return renderer.pdfData(actions: renderer.renderingActions)
-    }
-}
-
-private class CommonPDFRenderer: UIGraphicsPDFRenderer {
+class CommonPDFRenderer: UIGraphicsPDFRenderer {
 
     enum Column: String, CaseIterable {
 
@@ -81,7 +43,7 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
     let headersFillColor: UIColor
 
     private lazy var totals = invoice.totals
-    private var currentPageIndex = 0
+    private var renderableHeight: CGFloat = 0
 
     init(
         invoice: InvoiceInput,
@@ -111,62 +73,91 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
         )
     }
 
-    lazy var renderingActions: ((UIGraphicsPDFRendererContext) -> Void) = { [weak self] context in
+    func render() -> Data {
+        // Instead of multipage invoice, currently we use single page rendering, when page height adjusts to current
+        // renderable content height. To achieve this approach, firstly we need to calculate content height, so we
+        // call renderingActions method with empty context, just to launch rendering and set renderableHeight property
+        // when rendering finishes.
+        renderingActions(UIGraphicsPDFRendererContext())
+
+        // And now, when we've definitely determined renderable content height, we create actual UIGraphicsPDFRenderer
+        // with calculated content height, and start our invoice rendering.
+        let renderer = UIGraphicsPDFRenderer(
+            bounds: CGRect(
+                origin: .zero,
+                size: CGSize(
+                    width: metrics.pageWidth,
+                    height: renderableHeight
+                )
+            )
+        )
+        return renderer.pdfData(actions: renderingActions)
+    }
+
+    private lazy var renderingActions: ((UIGraphicsPDFRendererContext) -> Void) = { [weak self] context in
         guard let self else { return }
 
-        // Begin First Page
+        // MARK: - Page creation
+
         context.beginPage()
-        currentPageIndex = 0
+        let interBlockSpacing: CGFloat = 18
         var currentY = metrics.margin
 
-        // Business Name (top-left)
-        drawText(
+        // MARK: - Business Name (top-left)
+
+        let metaBlockWidth = metrics.pageWidth * 0.25
+        let businessNameHeight = drawText(
             invoice.issuer.name,
             font: .boldSystemFont(ofSize: 22),
-            at: CGPoint(x: metrics.margin, y: currentY)
+            at: CGPoint(x: metrics.margin, y: currentY),
+            maxWidth: metrics.contentWidth - metaBlockWidth - 8
         )
 
-        // Invoice meta block (top-right)
-        let metaBlockWidth = metrics.pageWidth * 0.3
-        let rightX = metrics.pageWidth - metrics.margin - metaBlockWidth
+        // MARK: - Invoice meta block (top-right)
+
+        let metaRightX = metrics.pageWidth - metrics.margin - metaBlockWidth
+        var metaY = currentY
         drawText(
             "INVOICE",
             font: .boldSystemFont(ofSize: 18),
-            at: CGPoint(x: rightX, y: currentY),
+            at: CGPoint(x: metaRightX, y: metaY),
             align: .right,
             maxWidth: metaBlockWidth
         )
-        currentY += metrics.lineHeight + 4
+        metaY += metrics.lineHeight + 4
 
         drawText(
             "#\(invoice.number)",
             font: .systemFont(ofSize: 11),
-            at: CGPoint(x: rightX, y: currentY),
+            at: CGPoint(x: metaRightX, y: metaY),
             align: .right,
             maxWidth: metaBlockWidth
         )
-        currentY += metrics.lineHeight
+        metaY += metrics.lineHeight
 
         drawText(
             "Due \(dateFormatter.string(from: invoice.dueDate ?? invoice.issuedDate))",
             font: .systemFont(ofSize: 11),
-            at: CGPoint(x: rightX, y: currentY),
+            at: CGPoint(x: metaRightX, y: metaY),
             align: .right,
             maxWidth: metaBlockWidth
         )
-        currentY += metrics.lineHeight
+        metaY += metrics.lineHeight
 
         drawText(
             "Issued \(dateFormatter.string(from: invoice.issuedDate))",
             font: .systemFont(ofSize: 11),
-            at: CGPoint(x: rightX, y: currentY),
+            at: CGPoint(x: metaRightX, y: metaY),
             align: .right,
             maxWidth: metaBlockWidth
         )
-        currentY = metrics.margin + metrics.lineHeight * 4 + 12
+        metaY += metrics.lineHeight
 
-        // FROM / BILL TO blocks
-        let columnWidth = metrics.contentWidth * 0.5
+        currentY = max(businessNameHeight, metaY) + interBlockSpacing
+
+        // MARK: - FROM / BILL TO blocks
+
+        let partyBlockWidth = metrics.contentWidth * 0.5
 
         drawText(
             "FROM",
@@ -177,22 +168,24 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
         drawText(
             "BILL TO",
             font: .boldSystemFont(ofSize: 10),
-            at: CGPoint(x: metrics.margin * 2 + columnWidth, y: currentY)
+            at: CGPoint(x: metrics.margin * 2 + partyBlockWidth, y: currentY)
         )
         currentY += metrics.lineHeight
 
-        let issuerFieldsCount = drawParty(
+        let issuerBlockHeight = drawParty(
             invoice.issuer,
-            at: CGPoint(x: metrics.margin, y: currentY)
+            at: CGPoint(x: metrics.margin, y: currentY),
+            width: partyBlockWidth
         )
-        let recipientFieldsCount = drawParty(
+        let recipientBlockHeight = drawParty(
             invoice.recipient,
-            at: CGPoint(x: metrics.margin * 2 + columnWidth, y: currentY)
+            at: CGPoint(x: metrics.margin * 2 + partyBlockWidth, y: currentY),
+            width: partyBlockWidth
         )
-        let maxPartyFieldsCount = max(issuerFieldsCount, recipientFieldsCount)
-        currentY += maxPartyFieldsCount * metrics.lineHeight + 12
+        currentY += max(issuerBlockHeight, recipientBlockHeight) + interBlockSpacing
 
-        // Work Items Table
+        // MARK: - Work Items Table
+
         drawTableHeader(in: context.cgContext, y: &currentY)
 
         let descriptionColumnWidth = Column.description.width(with: metrics)
@@ -201,35 +194,28 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
         let amountColumnWidth = Column.amount.width(with: metrics)
 
         for item in invoice.workItems {
-            let hasDescription = item.description?.isEmpty == false
-            let hasDiscount = item.discount != nil
-
-            var rowsRequired: CGFloat = 1
-            if hasDescription { rowsRequired += 1 }
-            if hasDiscount { rowsRequired += 1 }
-            let rowHeight = rowsRequired * metrics.lineHeight
-
-            currentY = beginPageIfNeeded(
-                context: context,
-                currentY: currentY,
-                requiredSpace: rowHeight
-            )
+            var y = currentY
             var x = metrics.margin
 
             // Description (+ optional note)
-            drawText(
+            let nameHeight = drawText(
                 item.name,
                 font: .boldSystemFont(ofSize: 12),
-                at: CGPoint(x: x + 4, y: currentY),
-                maxWidth: descriptionColumnWidth
+                at: CGPoint(x: x + 4, y: y),
+                maxWidth: descriptionColumnWidth,
+                verticalPadding: 2
             )
+            y += nameHeight
+
             if let description = item.description, !description.isEmpty {
-                drawText(
+                let descriptionHeight = drawText(
                     description,
                     font: .systemFont(ofSize: 11),
-                    at: CGPoint(x: x + 4, y: currentY + metrics.lineHeight),
-                    maxWidth: descriptionColumnWidth
+                    at: CGPoint(x: x + 4, y: y),
+                    maxWidth: descriptionColumnWidth,
+                    verticalPadding: 2
                 )
+                y += descriptionHeight
             }
             if let discount = item.discount {
                 let discountTitle: String
@@ -245,9 +231,10 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
                     discountTitle,
                     color: textColor.withAlphaComponent(0.6),
                     font: .systemFont(ofSize: 11),
-                    at: CGPoint(x: x + 4, y: currentY + metrics.lineHeight * 2),
+                    at: CGPoint(x: x + 4, y: y),
                     maxWidth: descriptionColumnWidth
                 )
+                y += metrics.lineHeight
             }
             x += descriptionColumnWidth
 
@@ -288,27 +275,29 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             cgContext.addLine(to: CGPoint(x: metrics.pageWidth - metrics.margin, y: currentY))
 
             // Bottom border
-            cgContext.move(to: CGPoint(x: metrics.margin, y: currentY + rowHeight))
-            cgContext.addLine(to: CGPoint(x: metrics.pageWidth - metrics.margin, y: currentY + rowHeight))
+            cgContext.move(to: CGPoint(x: metrics.margin, y: y))
+            cgContext.addLine(to: CGPoint(x: metrics.pageWidth - metrics.margin, y: y))
 
             // Vertical column lines
             x = metrics.margin
             Column.allCases
                 .map { $0.width(with: self.metrics) }
                 .forEach { width in
-                cgContext.move(to: CGPoint(x: x, y: currentY))
-                cgContext.addLine(to: CGPoint(x: x, y: currentY + rowHeight))
-                x += width
-            }
+                    cgContext.move(to: CGPoint(x: x, y: currentY))
+                    cgContext.addLine(to: CGPoint(x: x, y: y))
+                    x += width
+                }
             cgContext.move(to: CGPoint(x: x, y: currentY))
-            cgContext.addLine(to: CGPoint(x: x, y: currentY + rowHeight))
+            cgContext.addLine(to: CGPoint(x: x, y: y))
 
             cgContext.strokePath()
+            let rowHeight = y - currentY
             currentY += rowHeight
         }
 
-        // Summary
-        currentY += metrics.lineHeight
+        // MARK: - Summary
+
+        currentY += interBlockSpacing
 
         drawSummaryRow(
             title: "Subtotal",
@@ -368,9 +357,10 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             context: context.cgContext
         )
 
-        // Signature
+        // MARK: - Signature
+
         if let signature = invoice.signature {
-            currentY += metrics.lineHeight
+            currentY += interBlockSpacing
             drawSignature(
                 signature,
                 at: CGPoint(
@@ -381,10 +371,11 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
                 context: context.cgContext
             )
         } else {
-            currentY += metrics.lineHeight * 3
+            currentY += interBlockSpacing * 3
         }
 
-        // Notes
+        // MARK: - Notes
+
         if let notes = invoice.notes {
             drawText(
                 "NOTES",
@@ -394,16 +385,18 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             )
             currentY += metrics.lineHeight
 
-            drawText(
+            let notesHeight = drawText(
                 notes,
                 font: .systemFont(ofSize: 10),
                 at: CGPoint(x: metrics.margin, y: currentY),
-                maxWidth: metrics.contentWidth
+                maxWidth: metrics.contentWidth,
+                verticalPadding: 2
             )
-            currentY += metrics.lineHeight
+            currentY += notesHeight
         }
 
-        // Payment methods
+        // MARK: - Payment methods
+
         if !invoice.paymentMethods.isEmpty {
             currentY += metrics.lineHeight
             drawSeparator(
@@ -426,6 +419,7 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             let itemWidth = (metrics.contentWidth - (itemPadding * (allMethodsCount - 1))) / allMethodsCount
 
             var x: CGFloat = metrics.margin
+            var maxBlockHeight: CGFloat = 0
             invoice.paymentMethods.forEach { method in
                 switch method {
                 case let .bankTransfer(accountHolderName, bankName, routingNumber, accountNumber):
@@ -434,43 +428,43 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
                         "Bank transfer",
                         font: .boldSystemFont(ofSize: 12),
                         at: CGPoint(x: x, y: y),
-                        maxWidth: itemWidth
+                        maxWidth: itemWidth,
+                        verticalPadding: 2
                     )
                     y += self.metrics.lineHeight
 
-                    self.drawText(
+                    let accountHolderNameHeight = self.drawText(
                         "Account Holder: \(accountHolderName)",
                         at: CGPoint(x: x, y: y),
-                        maxWidth: itemWidth
+                        maxWidth: itemWidth,
+                        verticalPadding: 2
                     )
-                    y += self.metrics.lineHeight
+                    y += accountHolderNameHeight
 
-                    self.drawText(
+                    let bankNameHeight = self.drawText(
                         "Bank name: \(bankName)",
                         at: CGPoint(x: x, y: y),
-                        maxWidth: itemWidth
+                        maxWidth: itemWidth,
+                        verticalPadding: 2
                     )
-                    y += self.metrics.lineHeight
+                    y += bankNameHeight
 
-                    self.drawText(
-                        "Bank name: \(bankName)",
-                        at: CGPoint(x: x, y: y),
-                        maxWidth: itemWidth
-                    )
-                    y += self.metrics.lineHeight
-
-                    self.drawText(
+                    let routingNumberHeight = self.drawText(
                         "Routing number: \(routingNumber)",
                         at: CGPoint(x: x, y: y),
-                        maxWidth: itemWidth
+                        maxWidth: itemWidth,
+                        verticalPadding: 2
                     )
-                    y += self.metrics.lineHeight
+                    y += routingNumberHeight
 
-                    self.drawText(
+                    let accountNumberHeight = self.drawText(
                         "Account number: \(accountNumber)",
                         at: CGPoint(x: x, y: y),
-                        maxWidth: itemWidth
+                        maxWidth: itemWidth,
+                        verticalPadding: 2
                     )
+                    y += accountNumberHeight
+                    maxBlockHeight = max(maxBlockHeight, y - currentY)
 
                 case let .payPal(email, link):
                     var y = currentY
@@ -478,60 +472,71 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
                         "Pay Pal",
                         font: .boldSystemFont(ofSize: 12),
                         at: CGPoint(x: x, y: y),
-                        maxWidth: itemWidth
+                        maxWidth: itemWidth,
+                        verticalPadding: 2
                     )
                     y += self.metrics.lineHeight
 
-                    self.drawText(
+                    let emailHeight = self.drawText(
                         "email: \(email)",
                         at: CGPoint(x: x, y: y),
-                        maxWidth: itemWidth
+                        maxWidth: itemWidth,
+                        verticalPadding: 2
                     )
+                    y += emailHeight
 
                     if let link {
-                        y += self.metrics.lineHeight
-                        self.drawText(
+                        let linkHeight = self.drawText(
                             "PayPal.Me: \(link)",
                             at: CGPoint(x: x, y: y),
-                            maxWidth: itemWidth
+                            maxWidth: itemWidth,
+                            verticalPadding: 2
                         )
+                        y += linkHeight
+
+                        let qrCodeSize = CGSize(width: 60, height: 60)
+                        let qrCodeGenerator = QRCodeGenerator(
+                            encodable: link,
+                            fillColor: .black,
+                            size: qrCodeSize
+                        )
+                        if let qrCodeImage = qrCodeGenerator.image {
+                            y += self.metrics.lineHeight / 4
+                            let imageHeight = self.drawImage(
+                                qrCodeImage,
+                                at: CGPoint(x: x, y: y),
+                                size: qrCodeSize
+                            )
+                            y += imageHeight
+                        }
                     }
+                    maxBlockHeight = max(maxBlockHeight, y - currentY)
                 }
                 x += itemWidth + itemPadding
             }
-
+            currentY += maxBlockHeight
         }
 
-        //  Footer for last page
-        drawFooter(in: context.cgContext)
+        // Set global renderable page height
+        renderableHeight = currentY + metrics.bottomMargin
     }
+}
 
-    /// Starts a new page and draws footer for previous one and repeating header for new one.
-    func beginPageIfNeeded(
-        context: UIGraphicsPDFRendererContext,
-        currentY: CGFloat,
-        requiredSpace: CGFloat
-    ) -> CGFloat {
-        var y = currentY
-        if y + requiredSpace > metrics.pageHeight - metrics.bottomMargin {
-            drawFooter(in: context.cgContext)
-            context.beginPage()
-            currentPageIndex += 1
-            y = metrics.margin
-            drawTableHeader(in: context.cgContext, y: &y) // repeat table headers
-        }
-        return y
-    }
+// MARK: - Private methods
 
-    /// Draws text
+private extension CommonPDFRenderer {
+
+    /// Draws text, returns it's height
+    @discardableResult
     func drawText(
         _ text: String,
         color: UIColor? = nil,
         font: UIFont = .systemFont(ofSize: 12),
         at point: CGPoint,
         align: NSTextAlignment = .left,
-        maxWidth: CGFloat = .greatestFiniteMagnitude
-    ) {
+        maxWidth: CGFloat = .greatestFiniteMagnitude,
+        verticalPadding: CGFloat = 0
+    ) -> CGFloat {
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = align
 
@@ -541,73 +546,94 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             .paragraphStyle: paragraph
         ]
 
-        let rect = CGRect(
-            origin: point,
-            size: CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
+        let constraintSize = CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
+        let boundingRect = (text as NSString).boundingRect(
+            with: constraintSize,
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: attributes,
+            context: nil
+        )
+
+        let renderingHeight = boundingRect.height
+        let drawingRect = CGRect(
+            x: point.x,
+            y: point.y + verticalPadding,
+            width: maxWidth,
+            height: renderingHeight + verticalPadding
         )
 
         text.draw(
-            with: rect,
+            with: drawingRect,
             options: .usesLineFragmentOrigin,
             attributes: attributes,
             context: nil
         )
+
+        return renderingHeight + verticalPadding * 2
     }
 
-    // Draw image
+    /// Draw image, returns it's height
+    @discardableResult
     func drawImage(
         _ image: UIImage,
         at point: CGPoint,
         size: CGSize
-    ) {
+    ) -> CGFloat {
         image.draw(in: CGRect(
             x: point.x,
             y: point.y,
             width: size.width,
             height: size.height
         ))
+        return size.height
     }
 
-    /// Draws party
+    /// Draws party, returns block total height
     func drawParty(
         _ party: InvoiceInput.Party,
-        at point: CGPoint
+        at point: CGPoint,
+        width: CGFloat
     ) -> CGFloat {
         let x = point.x
         var y = point.y
-        var addetFieldsCount: CGFloat = 0
 
-        drawText(
+        let nameHeight = drawText(
             party.name,
             font: .boldSystemFont(ofSize: 13),
-            at: CGPoint(x: x, y: y)
+            at: CGPoint(x: x, y: y),
+            maxWidth: width,
+            verticalPadding: 2
         )
-        y += metrics.lineHeight
-        addetFieldsCount += 1
+        y += nameHeight
 
-        drawText(
+        let phoneNumberHeight = drawText(
             party.phoneNumber,
-            at: CGPoint(x: x, y: y)
+            at: CGPoint(x: x, y: y),
+            maxWidth: width,
+            verticalPadding: 2
         )
-        y += metrics.lineHeight
-        addetFieldsCount += 1
+        y += phoneNumberHeight
 
         if let email = party.email {
-            drawText(
+            let emailHeight = drawText(
                 email,
-                at: CGPoint(x: x, y: y)
+                at: CGPoint(x: x, y: y),
+                maxWidth: width,
+                verticalPadding: 2
             )
-            y += metrics.lineHeight
-            addetFieldsCount += 1
+            y += emailHeight
         }
 
-        drawText(
+        let addressHeight = drawText(
             party.address,
-            at: CGPoint(x: x, y: y)
+            at: CGPoint(x: x, y: y),
+            maxWidth: width,
+            verticalPadding: 2
         )
-        addetFieldsCount += 1
+        y += addressHeight
 
-        return addetFieldsCount
+        let partyBlockHeight = y - point.y
+        return partyBlockHeight
     }
 
     /// Draws summary's title and amount in a row
@@ -774,19 +800,6 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
         y += headerHeight
     }
 
-    /// Draws page footer
-    func drawFooter(in context: CGContext) {
-        let footerText = "Invoice #\(invoice.number) Page \(currentPageIndex + 1)"
-        let size = footerText.size(withAttributes: [.font: UIFont.systemFont(ofSize: 10)])
-        let x = metrics.margin
-        let y = metrics.pageHeight - metrics.bottomMargin + (metrics.bottomMargin - size.height) / 2
-        drawText(
-            footerText,
-            font: .systemFont(ofSize: 10),
-            at: CGPoint(x: x, y: y)
-        )
-    }
-
     func drawSeparator(
         in context: CGContext,
         at point: CGPoint,
@@ -804,6 +817,7 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
 // MARK: - Preview
 
 enum InputMock {
+
     static var input: InvoiceInput {
         .init(
             id: "#123",
@@ -827,7 +841,7 @@ enum InputMock {
             workItems: [
                 .init(
                     name: "Some Work",
-                    description: "Some work finished some time ago",
+                    description: "Some work finished some time ago \nand some additional work too",
                     price: 500,
                     quantity: 2,
                     unitType: .item,
@@ -836,7 +850,7 @@ enum InputMock {
                     saveToCatalog: true
                 ),
                 .init(
-                    name: "Some Work 2",
+                    name: "A lot of Some Work 2 \ncausing 2 lines of text",
                     description: "Some work finished some time ago too",
                     price: 100,
                     quantity: 9,
@@ -866,6 +880,8 @@ enum InputMock {
         )
     }
 }
+
+// MARK: - Preview
 
 struct PDFInvoicePreview: UIViewRepresentable {
     let data: Data
