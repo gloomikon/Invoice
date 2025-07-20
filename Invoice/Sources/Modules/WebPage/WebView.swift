@@ -8,6 +8,7 @@ struct WebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let view = WKWebView()
         view.navigationDelegate = context.coordinator
+        view.scrollView.backgroundColor = .clear
         return view
     }
 

@@ -6,26 +6,33 @@ struct WebPageView: View {
 
     private var header: some View {
         Text(viewModel.title)
-            .font(.system(size: 18, weight: .semibold))
+            .font(.poppins(size: 22, weight: .semiBold))
             .frame(maxWidth: .infinity)
             .overlay(alignment: .leading) {
-                Icon(systemName: "chevron.backward")
-                    .scaledToFit()
-                    .frame(width: 18, height: 18)
-                    .font(.system(size: 14, weight: .semibold))
-                    .padding(.leading, 16)
-                    .onTapGesture {
-                        viewModel.close()
-                    }
+                Button {
+                    viewModel.close()
+                } label: {
+                    Icon(systemName: "chevron.backward")
+                        .scaledToFit()
+                        .frame(height: 18)
+                        .font(.system(size: 14, weight: .medium))
+                }
+                .buttonStyle(.icon)
             }
+            .foregroundStyle(.textPrimary)
     }
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             header
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+            Rectangle()
+                .fill(.neutral300)
+                .frame(height: 1)
             WebView(url: viewModel.url)
                 .ignoresSafeArea(edges: .bottom)
         }
-        .background(.background)
+        .background(.backgroundPrimary)
     }
 }

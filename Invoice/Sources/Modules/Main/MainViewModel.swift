@@ -18,6 +18,7 @@ struct Invoice: Identifiable {
     let currency: Currency
 }
 
+@MainActor
 class MainViewModel: ObservableObject {
 
     // MARK: - Injected properties
@@ -83,6 +84,10 @@ class MainViewModel: ObservableObject {
     init(router: MainRouter) {
         self.router = router
         appStorage.didSeeMain = true
+    }
+
+    func openSettings() {
+        router.openSettings()
     }
 }
 

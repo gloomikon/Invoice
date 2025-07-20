@@ -8,4 +8,6 @@ enum AppConstant {
 
     static let amplitudeAPIKey = ""
     static let adjustAppToken = ""
+
+    static let appstoreID = "6746712161"
 }
