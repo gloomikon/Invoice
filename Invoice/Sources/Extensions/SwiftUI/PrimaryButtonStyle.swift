@@ -9,6 +9,8 @@ struct PrimaryButtonStyle: ButtonStyle {
             .frame(height: 56)
             .background(.linkedIn, in: .capsule)
             .foregroundStyle(.white)
+            .scaleEffect(configuration.isPressed ? 0.975 : 1)
+            .animation(.easeInOut(duration: 0.2), value: configuration.isPressed)
     }
 }
 

@@ -1,3 +1,4 @@
-protocol MainRouter {
+@MainActor protocol MainRouter {
 
+    func openSettings()
 }

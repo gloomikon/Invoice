@@ -2,6 +2,7 @@ import XCoordinator
 
 enum MainRoute: Route {
     case main
+    case settings
 }
 
 class MainCoordinator: NavigationCoordinator<MainRoute> {
@@ -13,9 +14,13 @@ class MainCoordinator: NavigationCoordinator<MainRoute> {
 
     override func prepareTransition(for route: MainRoute) -> NavigationTransition {
         switch route {
+
         case .main:
             let module = MainModule(router: self)
             return .set(module.build())
+
+        case .settings:
+            return .none(SettingsCoordinator(rootViewController: rootViewController))
         }
     }
 }
@@ -24,4 +29,7 @@ class MainCoordinator: NavigationCoordinator<MainRoute> {
 
 extension MainCoordinator: MainRouter {
 
+    func openSettings() {
+        trigger(.settings)
+    }
 }

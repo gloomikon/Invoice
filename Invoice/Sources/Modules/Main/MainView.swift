@@ -11,10 +11,15 @@ struct MainView: View {
                 .foregroundStyle(.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Icon(.settings)
-                .scaledToFit()
-                .frame(width: 24, height: 24)
-                .foregroundStyle(.neutral700)
+            Button {
+                viewModel.openSettings()
+            } label: {
+                Icon(.settings)
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .foregroundStyle(.neutral700)
+            }
+            .buttonStyle(.icon)
         }
     }
 
