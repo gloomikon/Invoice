@@ -2,59 +2,7 @@ import PDFKit
 import SwiftUI
 import UIKit
 
-protocol InvoiceRenderable {
-
-    func render(from input: InvoiceInput) -> Data
-}
-
-class CommonInvoiceRenderer: InvoiceRenderable {
-
-    let textColor: UIColor
-    let tableBorderColor: UIColor
-    let headersFillColor: UIColor
-
-    init(
-        textColor: UIColor = .black,
-        tableBorderColor: UIColor = .black,
-        headersFillColor: UIColor = .systemGray6
-    ) {
-        self.textColor = textColor
-        self.tableBorderColor = tableBorderColor
-        self.headersFillColor = headersFillColor
-    }
-
-    func render(from invoice: InvoiceInput) -> Data {
-        let renderer = CommonPDFRenderer(
-            invoice: invoice,
-            metrics: InvoicePageMetrics(
-                pageFormat: .usLetter,
-                margin: 36,
-                lineHeight: 18,
-                bottomMargin: 48
-            ),
-            currencyFormatter: {
-                let numberFormatter = NumberFormatter()
-                numberFormatter.numberStyle = .currency
-                numberFormatter.currencyCode = invoice.currency.code
-                numberFormatter.currencySymbol = invoice.currency.symbol
-                numberFormatter.maximumFractionDigits = 2
-                return numberFormatter
-            }(),
-            dateFormatter: {
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateStyle = .medium
-                return dateFormatter
-            }(),
-            textColor: textColor,
-            tableBorderColor: tableBorderColor,
-            headersFillColor: headersFillColor
-        )
-
-        return renderer.render()
-    }
-}
-
-private class CommonPDFRenderer: UIGraphicsPDFRenderer {
+class CommonPDFRenderer: UIGraphicsPDFRenderer {
 
     enum Column: String, CaseIterable {
 
@@ -126,8 +74,14 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
     }
 
     func render() -> Data {
+        // Instead of multipage invoice, currently we use single page rendering, when page height adjusts to current
+        // renderable content height. To achieve this approach, firstly we need to calculate content height, so we
+        // call renderingActions method with empty context, just to launch rendering and set renderableHeight property
+        // when rendering finishes.
         renderingActions(UIGraphicsPDFRendererContext())
 
+        // And now, when we've definitely determined renderable content height, we create actual UIGraphicsPDFRenderer
+        // with calculated content height, and start our invoice rendering.
         let renderer = UIGraphicsPDFRenderer(
             bounds: CGRect(
                 origin: .zero,
@@ -143,12 +97,14 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
     private lazy var renderingActions: ((UIGraphicsPDFRendererContext) -> Void) = { [weak self] context in
         guard let self else { return }
 
-        // Begin First Page
+        // MARK: - Page creation
+
         context.beginPage()
         let interBlockSpacing: CGFloat = 18
         var currentY = metrics.margin
 
-        // Business Name (top-left)
+        // MARK: - Business Name (top-left)
+
         let metaBlockWidth = metrics.pageWidth * 0.25
         let businessNameHeight = drawText(
             invoice.issuer.name,
@@ -157,7 +113,8 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             maxWidth: metrics.contentWidth - metaBlockWidth - 8
         )
 
-        // Invoice meta block (top-right)
+        // MARK: - Invoice meta block (top-right)
+
         let metaRightX = metrics.pageWidth - metrics.margin - metaBlockWidth
         var metaY = currentY
         drawText(
@@ -198,7 +155,8 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
 
         currentY = max(businessNameHeight, metaY) + interBlockSpacing
 
-        // FROM / BILL TO blocks
+        // MARK: - FROM / BILL TO blocks
+
         let partyBlockWidth = metrics.contentWidth * 0.5
 
         drawText(
@@ -226,7 +184,8 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
         )
         currentY += max(issuerBlockHeight, recipientBlockHeight) + interBlockSpacing
 
-        // Work Items Table
+        // MARK: - Work Items Table
+
         drawTableHeader(in: context.cgContext, y: &currentY)
 
         let descriptionColumnWidth = Column.description.width(with: metrics)
@@ -324,10 +283,10 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             Column.allCases
                 .map { $0.width(with: self.metrics) }
                 .forEach { width in
-                cgContext.move(to: CGPoint(x: x, y: currentY))
-                cgContext.addLine(to: CGPoint(x: x, y: y))
-                x += width
-            }
+                    cgContext.move(to: CGPoint(x: x, y: currentY))
+                    cgContext.addLine(to: CGPoint(x: x, y: y))
+                    x += width
+                }
             cgContext.move(to: CGPoint(x: x, y: currentY))
             cgContext.addLine(to: CGPoint(x: x, y: y))
 
@@ -336,7 +295,8 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             currentY += rowHeight
         }
 
-        // Summary
+        // MARK: - Summary
+
         currentY += interBlockSpacing
 
         drawSummaryRow(
@@ -397,7 +357,8 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             context: context.cgContext
         )
 
-        // Signature
+        // MARK: - Signature
+
         if let signature = invoice.signature {
             currentY += interBlockSpacing
             drawSignature(
@@ -413,7 +374,8 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             currentY += interBlockSpacing * 3
         }
 
-        // Notes
+        // MARK: - Notes
+
         if let notes = invoice.notes {
             drawText(
                 "NOTES",
@@ -433,7 +395,8 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             currentY += notesHeight
         }
 
-        // Payment methods
+        // MARK: - Payment methods
+
         if !invoice.paymentMethods.isEmpty {
             currentY += metrics.lineHeight
             drawSeparator(
@@ -554,9 +517,14 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
             currentY += maxBlockHeight
         }
 
-        // Set global renderable page heoght
+        // Set global renderable page height
         renderableHeight = currentY + metrics.bottomMargin
     }
+}
+
+// MARK: - Private methods
+
+private extension CommonPDFRenderer {
 
     /// Draws text, returns it's height
     @discardableResult
@@ -849,6 +817,7 @@ private class CommonPDFRenderer: UIGraphicsPDFRenderer {
 // MARK: - Preview
 
 enum InputMock {
+
     static var input: InvoiceInput {
         .init(
             id: "#123",
@@ -911,6 +880,8 @@ enum InputMock {
         )
     }
 }
+
+// MARK: - Preview
 
 struct PDFInvoicePreview: UIViewRepresentable {
     let data: Data
