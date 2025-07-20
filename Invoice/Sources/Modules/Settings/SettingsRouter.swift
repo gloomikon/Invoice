@@ -38,7 +38,10 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
             return .pop()
 
         case .clientsList:
-            return .push(UIViewController())
+            return .none(ClientsListCoordinator(
+                rootViewController: rootViewController,
+                onClientSelected: { _ in }
+            ))
 
         case .issuerList:
             return .push(UIViewController())

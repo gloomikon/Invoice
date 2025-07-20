@@ -257,6 +257,7 @@ struct SettingsView: View {
                     }
                 }
                 .padding(12)
+                .contentShape(.rect)
             }
             .buttonStyle(.empty)
             .listRowInsets(EdgeInsets())

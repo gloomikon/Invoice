@@ -13,7 +13,7 @@ class CD_Client: NSManagedObject, Managed, Identifiable {
         [dateModifiedSortDescriptor]
     }
 
-    @NSManaged private(set) var id: UUID
+    @NSManaged private(set) var id: String
 
     @NSManaged private(set) var name: String
 
@@ -48,13 +48,14 @@ extension CD_Client {
     @discardableResult
     static func create(
         in context: NSManagedObjectContext,
+        id: String?,
         name: String,
         email: Email?,
         phone: String?,
         address: String?
     ) -> Self {
         Self.create(in: context) { client in
-            client.id = UUID()
+            client.id = id ?? UUID().uuidString
             client.name = name
             client.email = email
             client.phone = phone
