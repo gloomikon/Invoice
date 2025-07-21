@@ -3,19 +3,15 @@ import XCoordinator
 protocol ClientsListRouter {
 
     func close()
-//    func openImportFromContacts()
 }
 
 enum ClientListRoute: Route {
 
     case clientsList((CD_Client) -> Void)
     case dismiss
-//    case importFromContacts
-//    case addClient
 }
 
 class ClientsListCoordinator: NavigationCoordinator<ClientListRoute> {
-
 
     init(
         rootViewController: UINavigationController,
@@ -29,7 +25,10 @@ class ClientsListCoordinator: NavigationCoordinator<ClientListRoute> {
         switch route {
 
         case let .clientsList(onClientSelected):
-            let module = ClientsListModule(router: self)
+            let module = ClientsListModule(
+                router: self,
+                onClientSelected: onClientSelected
+            )
             return .present(module.build(), modalPresentationStyle: .fullScreen)
 
         case .dismiss:

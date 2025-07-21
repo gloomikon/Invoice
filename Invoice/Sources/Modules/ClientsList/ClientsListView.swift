@@ -40,6 +40,9 @@ struct ClientsListView: View {
                                 .listRowInsets(EdgeInsets())
                                 .listRowSeparatorTint(.linkedIn.opacity(0.1))
                                 .listRowBackground(Color.white)
+                                .onTapGesture {
+                                    viewModel.clientSelected(client)
+                                }
                         }
                         .onDelete { indexSet in
                             for index in indexSet {
@@ -49,19 +52,9 @@ struct ClientsListView: View {
                         }
                     } header: {
                         Text("Name")
+                            .textCase(nil)
                             .font(.poppins(size: 12, weight: .medium))
                             .foregroundStyle(.textSecondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .listRowInsets(
-                                EdgeInsets(
-                                    top: 0,
-                                    leading: 12,
-                                    bottom: 0,
-                                    trailing: 0
-                                )
-                            )
-                            .listRowSeparator(.hidden)
-                            .listRowBackground(Color.clear)
                     }
                     .padding(.top, 8)
                 }
@@ -105,7 +98,7 @@ struct ClientsListView: View {
 
     private struct ClientRow: View {
 
-        let client: CD_Client
+        let client: Client
 
         var body: some View {
             HStack {
@@ -122,6 +115,7 @@ struct ClientsListView: View {
             }
             .padding(12)
             .background(.white, in: .rect(cornerRadius: 16))
+            .contentShape(.rect)
         }
     }
 

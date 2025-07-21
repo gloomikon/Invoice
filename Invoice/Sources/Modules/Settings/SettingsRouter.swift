@@ -18,6 +18,7 @@ enum SettingsRoute: Route {
     case itemsList
     case termsOfUse
     case privacyPolicy
+    case edit(CD_Client)
 }
 
 class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
@@ -40,7 +41,9 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
         case .clientsList:
             return .none(ClientsListCoordinator(
                 rootViewController: rootViewController,
-                onClientSelected: { _ in }
+                onClientSelected: { [unowned self] client in
+                    trigger(.edit(client))
+                }
             ))
 
         case .issuerList:
@@ -61,6 +64,12 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
                 rootViewController: rootViewController,
                 url: AppConstant.privacyPolicy,
                 title: String(localized: "Privacy Policy")
+            ))
+
+        case let .edit(client):
+            return .none(EditClientCoordinator(
+                rootViewController: rootViewController,
+                client: client
             ))
         }
     }

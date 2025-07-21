@@ -1,6 +1,6 @@
 import Foundation
 
-struct Email: Codable {
+struct Email: Codable, Equatable {
     let email: String
 
     init?(_ email: String) {

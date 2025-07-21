@@ -1,4 +1,4 @@
-import Combine
+import CombineExt
 import Depin
 
 @MainActor
@@ -9,24 +9,34 @@ class ClientsListViewModel: ObservableObject {
     @Injected private var databaseManager: DatabaseManager
 
     private let router: ClientsListRouter
+    private let onClientSelected: (CD_Client) -> Void
 
     // MARK: - Public properties
 
-    @Published var clients: [CD_Client] = []
+    @Published var clients: [Client] = []
 
-    init(router: ClientsListRouter) {
+    init(
+        router: ClientsListRouter,
+        onClientSelected: @escaping (CD_Client) -> Void
+    ) {
         self.router = router
+        self.onClientSelected = onClientSelected
 
         bind()
     }
 
     private func bind() {
         databaseManager.$clients
+            .map { $0.map(Client.init) }
             .assign(to: &$clients)
     }
 
     func close() {
         router.close()
+    }
+
+    func clientSelected(_ client: Client) {
+        onClientSelected(client.cdClient)
     }
 
     func importedContacts(_ contacts: [Contact]) {

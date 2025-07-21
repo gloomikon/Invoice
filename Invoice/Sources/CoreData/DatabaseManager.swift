@@ -44,6 +44,25 @@ class DatabaseManager: ObservableObject {
     }
 
     @MainActor
+    func updateClient(
+        _ client: CD_Client,
+        name: String,
+        email: Email?,
+        phone: String?,
+        address: String?
+    ) {
+        context.performChanges { [self] in
+            client.update(
+                in: context,
+                name: name,
+                email: email,
+                phone: phone,
+                address: address
+            )
+        }
+    }
+
+    @MainActor
     func deleteClient(with id: String) {
         guard let target = clients.first(where: { $0.id == id }) else { return }
 

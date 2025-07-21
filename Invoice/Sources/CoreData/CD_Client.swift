@@ -64,4 +64,18 @@ extension CD_Client {
             client.dateModified = Date()
         }
     }
+
+    func update(
+        in context: NSManagedObjectContext,
+        name: String,
+        email: Email?,
+        phone: String?,
+        address: String?
+    ) {
+        self.name = name
+        self.email = email
+        self.phone = phone
+        self.address = address
+        self.dateModified = Date()
+    }
 }
