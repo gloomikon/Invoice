@@ -6,11 +6,18 @@ class SignatureViewModel: ObservableObject {
 
     @Injected private var appStorage: AppStorage
 
-    func close() {
+    private let router: SignatureRouter
 
+    init(router: SignatureRouter) {
+        self.router = router
+    }
+
+    func close() {
+        router.close()
     }
 
     func createSignatureTapped(signature: UIImage?) {
         appStorage.userSignature = signature
+        router.close()
     }
 }
