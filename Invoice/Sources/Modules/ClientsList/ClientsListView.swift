@@ -82,7 +82,7 @@ struct ClientsListView: View {
                     }
 
                     Button("Create client") {
-
+                        viewModel.openCreateClient()
                     }
                     .buttonStyle(.primary)
                 }

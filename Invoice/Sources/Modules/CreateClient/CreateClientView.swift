@@ -1,12 +1,12 @@
 import SwiftUI
 import UIKitExt
 
-struct EditClientView: View {
+struct CreateClientView: View {
 
-    @ObservedObject var viewModel: EditClientViewModel
+    @ObservedObject var viewModel: CreateClientViewModel
 
     private var header: some View {
-        Text("Edit Client")
+        Text("New Client")
             .font(.poppins(size: 22, weight: .semiBold))
             .frame(maxWidth: .infinity)
             .overlay(alignment: .leading) {
@@ -199,19 +199,26 @@ struct EditClientView: View {
         .foregroundStyle(.textPrimary)
     }
 
-    private var deleteClient: some View {
+    private var importClient: some View {
         Button {
-            viewModel.delete()
+            pickContact { contact in
+                viewModel.importedContact(contact)
+            }
         } label: {
             HStack(spacing: 8) {
-                Icon(systemName: "trash")
+                Icon(.contactBook)
                     .scaledToFit()
-                    .frame(width: 12)
-                Text("Delete client")
+                    .frame(width: 18)
+                Text("Import from contacts")
             }
-            .padding(8)
-            .foregroundStyle(.red)
+            .frame(height: 40)
+            .foregroundStyle(.textPrimary)
             .font(.poppins(size: 14, weight: .medium))
+            .padding(.horizontal, 12)
+            .overlay {
+                Capsule()
+                    .stroke(.neutral300, lineWidth: 1)
+            }
         }
         .buttonStyle(.icon)
     }
@@ -227,9 +234,9 @@ struct EditClientView: View {
                     .frame(height: 1)
                 ScrollView {
                     VStack(spacing: 12) {
+                        importClient
                         nameSection
                         contactsSection
-                        deleteClient
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 16)

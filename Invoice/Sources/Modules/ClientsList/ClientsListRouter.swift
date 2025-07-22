@@ -3,12 +3,14 @@ import XCoordinator
 protocol ClientsListRouter {
 
     func close()
+    func openCreateClient()
 }
 
 enum ClientListRoute: Route {
 
     case clientsList((CD_Client) -> Void)
     case dismiss
+    case createClient
 }
 
 class ClientsListCoordinator: NavigationCoordinator<ClientListRoute> {
@@ -33,6 +35,11 @@ class ClientsListCoordinator: NavigationCoordinator<ClientListRoute> {
 
         case .dismiss:
             return .dismiss()
+
+        case .createClient:
+            return .none(CreateClientCoordinator(
+                rootViewController: rootViewController
+            ))
         }
     }
 }
@@ -43,5 +50,9 @@ extension ClientsListCoordinator: ClientsListRouter {
 
     func close() {
         trigger(.dismiss)
+    }
+
+    func openCreateClient() {
+        trigger(.createClient)
     }
 }

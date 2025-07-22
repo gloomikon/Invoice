@@ -51,6 +51,10 @@ class ClientsListViewModel: ObservableObject {
         }
     }
 
+    func openCreateClient() {
+        router.openCreateClient()
+    }
+
     func deleteClient(with id: String) {
         databaseManager.deleteClient(with: id)
     }
