@@ -1,11 +1,13 @@
 import Core
 import DebugPanel
 import FoundationExt
+import UIKit
 
 class AppStorage {
 
     private enum Constant {
         static let deviceUDID = "deviceUDID"
+        static let signatureFileName = "signature.png"
     }
 
     @Storage("didLaunchApp", default: false)
@@ -58,6 +60,34 @@ class AppStorage {
         }
         set {
             keychain[Constant.deviceUDID] = newValue
+        }
+    }
+
+    var userSignature: UIImage? {
+        get {
+            guard let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                return nil
+            }
+            let filePath = directory.appendingPathComponent(Constant.signatureFileName).path
+
+            guard FileManager.default.fileExists(atPath: filePath) else { return nil }
+
+            return UIImage(contentsOfFile: filePath)
+        }
+        set {
+            guard let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                return
+            }
+            let fileManager = FileManager.default
+            let fileUrl = directory.appendingPathComponent(Constant.signatureFileName)
+
+            if let image = newValue, let imageData = image.pngData() {
+                try? imageData.write(to: fileUrl)
+            } else {
+                if fileManager.fileExists(atPath: fileUrl.path) {
+                    try? fileManager.removeItem(at: fileUrl)
+                }
+            }
         }
     }
 }
