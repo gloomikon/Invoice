@@ -25,6 +25,7 @@ class DatabaseManager: ObservableObject {
     }
 
     func createClient(
+        id: String? = nil,
         name: String,
         email: Email?,
         phone: String?,
@@ -33,11 +34,40 @@ class DatabaseManager: ObservableObject {
         context.performChanges { [self] in
             CD_Client.create(
                 in: context,
+                id: id,
                 name: name,
                 email: email,
                 phone: phone,
                 address: address
             )
+        }
+    }
+
+    @MainActor
+    func updateClient(
+        _ client: CD_Client,
+        name: String,
+        email: Email?,
+        phone: String?,
+        address: String?
+    ) {
+        context.performChanges { [self] in
+            client.update(
+                in: context,
+                name: name,
+                email: email,
+                phone: phone,
+                address: address
+            )
+        }
+    }
+
+    @MainActor
+    func deleteClient(with id: String) {
+        guard let target = clients.first(where: { $0.id == id }) else { return }
+
+        context.performChanges { [self] in
+            target.delete(in: context)
         }
     }
 

@@ -9,7 +9,9 @@ public struct FrameKey: PreferenceKey {
 
 public extension View {
 
-    func onFrameChange(perform action: ((CGRect) -> Void)? = nil) -> some View {
+    func onFrameChange(
+        perform action: (@MainActor (CGRect) -> Void)? = nil
+    ) -> some View {
         overlay {
             GeometryReader { proxy in
                 Color.clear.preference(key: FrameKey.self, value: proxy.frame(in: .global))
@@ -41,6 +43,14 @@ public extension View {
     func onWidthChange(_ frame: Binding<CGFloat>) -> some View {
         onFrameChange { rect in
             Task { @MainActor in frame.wrappedValue = rect.width }
+        }
+    }
+
+    func onWidthChange(
+        perform action: (@MainActor (CGFloat) -> Void)? = nil
+    ) -> some View {
+        onFrameChange { rect in
+            Task { @MainActor in action?(rect.width) }
         }
     }
 }
