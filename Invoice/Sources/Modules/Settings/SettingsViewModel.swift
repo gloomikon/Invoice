@@ -44,8 +44,8 @@ class SettingsViewModel: ObservableObject {
         router.openClientsList()
     }
 
-    func openIssuersList() {
-        router.openIssuersList()
+    func openBusinessesList() {
+        router.openBusinessesList()
     }
 
     func openItemsList() {

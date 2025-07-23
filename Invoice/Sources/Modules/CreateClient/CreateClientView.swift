@@ -238,9 +238,10 @@ struct CreateClientView: View {
                         nameSection
                         contactsSection
                     }
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, 16)
                     .padding(.vertical, 16)
                 }
+                .scrollIndicators(.hidden)
             }
             .onTapGesture {
                 focus = nil

@@ -6,7 +6,7 @@ protocol SettingsRouter {
     func openPrivacyPolicy()
     func openTermsOfUse()
     func openClientsList()
-    func openIssuersList()
+    func openBusinessesList()
     func openItemsList()
 }
 
@@ -14,11 +14,12 @@ enum SettingsRoute: Route {
     case settings
     case pop
     case clientsList
-    case issuerList
+    case businessesList
     case itemsList
     case termsOfUse
     case privacyPolicy
-    case edit(CD_Client)
+    case editClient(CD_Client)
+    case editBusiness(CD_Business)
 }
 
 class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
@@ -42,12 +43,17 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
             return .none(ClientsListCoordinator(
                 rootViewController: rootViewController,
                 onClientSelected: { [unowned self] client in
-                    trigger(.edit(client))
+                    trigger(.editClient(client))
                 }
             ))
 
-        case .issuerList:
-            return .push(UIViewController())
+        case .businessesList:
+            return .none(BusinessesListCoordinator(
+                rootViewController: rootViewController,
+                onBusinessSelected: { [unowned self] business in
+                    trigger(.editBusiness(business))
+                }
+            ))
 
         case .itemsList:
             return .push(UIViewController())
@@ -66,10 +72,16 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
                 title: String(localized: "Privacy Policy")
             ))
 
-        case let .edit(client):
+        case let .editClient(client):
             return .none(EditClientCoordinator(
                 rootViewController: rootViewController,
                 client: client
+            ))
+
+        case let .editBusiness(business):
+            return .none(EditBusinessCoordinator(
+                rootViewController: rootViewController,
+                business: business
             ))
         }
     }
@@ -93,8 +105,8 @@ extension SettingsCoordinator: SettingsRouter {
         trigger(.clientsList)
     }
 
-    func openIssuersList() {
-        trigger(.issuerList)
+    func openBusinessesList() {
+        trigger(.businessesList)
     }
 
     func openItemsList() {

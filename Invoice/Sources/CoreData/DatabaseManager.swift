@@ -51,9 +51,8 @@ class DatabaseManager: ObservableObject {
         phone: String?,
         address: String?
     ) {
-        context.performChanges { [self] in
+        context.performChanges {
             client.update(
-                in: context,
                 name: name,
                 email: email,
                 phone: phone,
@@ -77,7 +76,7 @@ class DatabaseManager: ObservableObject {
         contactEmail: Email?,
         contactPhone: String?,
         contactAddress: String?,
-        logoURLString: String?
+        signatureFileName: String?
     ) {
         context.performChanges { [self] in
             CD_Business.create(
@@ -87,8 +86,38 @@ class DatabaseManager: ObservableObject {
                 contactEmail: contactEmail,
                 contactPhone: contactPhone,
                 contactAddress: contactAddress,
-                logoURLString: logoURLString
+                signatureFileName: signatureFileName
             )
+        }
+    }
+
+    func updateBusiness(
+        _ business: CD_Business,
+        name: String,
+        contactName: String?,
+        contactEmail: Email?,
+        contactPhone: String?,
+        contactAddress: String?,
+        signatureFileName: String?
+    ) {
+        context.performChanges {
+            business.update(
+                name: name,
+                contactName: contactName,
+                contactEmail: contactEmail,
+                contactPhone: contactPhone,
+                contactAddress: contactAddress,
+                signatureFileName: signatureFileName
+            )
+        }
+    }
+
+    @MainActor
+    func deleteBusiness(with id: UUID) {
+        guard let target = businesses.first(where: { $0.id == id }) else { return }
+
+        context.performChanges { [self] in
+            target.delete(in: context)
         }
     }
 }

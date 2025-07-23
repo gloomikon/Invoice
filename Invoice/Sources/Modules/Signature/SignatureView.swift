@@ -26,7 +26,8 @@ struct SignatureView: View {
         VStack(spacing: .zero) {
             header
                 .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .padding(.bottom, 12)
+                .padding(.top, 20)
 
             VStack(spacing: 24) {
                 Text("Sign below")
@@ -36,11 +37,10 @@ struct SignatureView: View {
                 SignatureDrawingView(
                     clearTrigger: $clearTrigger,
                     generateImageTrigger: $generateImageTrigger,
-                    hasSignature: $hasSignature,
-                    generateImageHandler: { signatureImage in
-                        viewModel.createSignatureTapped(signature: signatureImage)
-                    }
-                )
+                    hasSignature: $hasSignature
+                ) { signatureImage in
+                    viewModel.createSignatureTapped(signature: signatureImage)
+                }
                 .frame(height: 200)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay(

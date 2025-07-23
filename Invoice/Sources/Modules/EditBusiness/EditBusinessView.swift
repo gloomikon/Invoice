@@ -1,12 +1,12 @@
-import SwiftUI
+import SwiftUIExt
 import UIKitExt
 
-struct EditClientView: View {
+struct EditBusinessView: View {
 
-    @ObservedObject var viewModel: EditClientViewModel
+    @ObservedObject var viewModel: EditBusinessViewModel
 
     private var header: some View {
-        Text("Edit Client")
+        Text("Edit Business")
             .font(.poppins(size: 22, weight: .semiBold))
             .frame(maxWidth: .infinity)
             .overlay(alignment: .leading) {
@@ -25,9 +25,10 @@ struct EditClientView: View {
 
     private enum Focus: Hashable {
         case name
-        case email
-        case phone
-        case address
+        case contactName
+        case contactEmail
+        case contactPhone
+        case contactAddress
     }
 
     @FocusState private var focus: Focus?
@@ -36,7 +37,7 @@ struct EditClientView: View {
 
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: .zero) {
-            Text("Name")
+            Text("Business Name")
                 .textCase(nil)
                 .font(.poppins(size: 12, weight: .medium))
                 .foregroundStyle(.textSecondary)
@@ -46,7 +47,7 @@ struct EditClientView: View {
                 "",
                 text: $viewModel.name,
                 prompt: Text(
-                    String(localized: "Client's Name")
+                    String(localized: "Name")
                         .attributedString
                         .setForegroundColor(.textSecondary)
                 )
@@ -57,7 +58,7 @@ struct EditClientView: View {
             .autocorrectionDisabled()
             .padding(.top, 12)
 
-            Text("Client's name is required")
+            Text("Business name is required")
                 .font(.poppins(size: 12, weight: .medium))
                 .foregroundStyle(.red)
                 .opacity(showNoNameError ? 1 : 0)
@@ -78,9 +79,88 @@ struct EditClientView: View {
     @State private var emailTypingState: TypingState = .initial
     @State private var wrongEmail = false
 
+    @ViewBuilder
+    private var signatureSection: some View {
+        VStack {
+            if let signature = viewModel.signature {
+                Container {
+                    Image(uiImage: signature)
+                        .resizable()
+                        .scaledToFill()
+                }
+                .background(.white)
+                .frame(height: 200)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(.linkedIn, lineWidth: 2)
+                }
+                .overlay(alignment: .topTrailing) {
+                    Button {
+                        viewModel.clearSignature()
+                    } label: {
+                        Icon(systemName: "trash")
+                            .scaledToFit()
+                            .frame(width: 16)
+                            .padding(6)
+                            .foregroundStyle(.red)
+                            .background(
+                                .red.opacity(0.2),
+                                in: .rect(cornerRadius: 8)
+                            )
+                    }
+                    .buttonStyle(.icon)
+                    .padding(12)
+                }
+            } else {
+                Button {
+                    viewModel.openSignature()
+                } label: {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(.white)
+                        .overlay {
+                            VStack(spacing: 12) {
+                                Text("Add the signature (optional)")
+                                    .font(.poppins(size: 14))
+
+                                Icon(systemName: "pencil.and.outline")
+                                    .scaledToFit()
+                                    .frame(width: 30)
+                            }
+                            .foregroundStyle(.textSecondary)
+                        }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(.textSecondary, style: .init(lineWidth: 2, dash: [5, 5]))
+                        }
+                        .frame(height: 200)
+                }
+                .buttonStyle(.icon)
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: viewModel.signature == nil)
+    }
+
+    private var deleteBusiness: some View {
+        Button {
+            viewModel.delete()
+        } label: {
+            HStack(spacing: 8) {
+                Icon(systemName: "trash")
+                    .scaledToFit()
+                    .frame(width: 12)
+                Text("Delete business")
+            }
+            .padding(8)
+            .foregroundStyle(.red)
+            .font(.poppins(size: 14, weight: .medium))
+        }
+        .buttonStyle(.icon)
+    }
+
     private var contactsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Contacts")
+            Text("Business Contacts")
                 .textCase(nil)
                 .font(.poppins(size: 12, weight: .medium))
                 .foregroundStyle(.textSecondary)
@@ -89,51 +169,74 @@ struct EditClientView: View {
 
                 TextField(
                     "",
-                    text: $viewModel.email,
+                    text: $viewModel.contactName,
                     prompt: Text(
                         String(localized: "Optional")
                             .attributedString
                             .setForegroundColor(.textSecondary)
                     )
                 )
-                .focused($focus, equals: .email)
+                .focused($focus, equals: .contactName)
+                .textFieldStyle(
+                    ClearableTextFieldStyle(
+                        description: "Name",
+                        descriptionWidth: maxElementWidth,
+                        text: $viewModel.contactName,
+                        hasError: false
+                    )
+                )
+                .contentShape(.rect)
+                .onTapGesture {
+                    focus = .contactName
+                }
+
+                TextField(
+                    "",
+                    text: $viewModel.contactEmail,
+                    prompt: Text(
+                        String(localized: "Optional")
+                            .attributedString
+                            .setForegroundColor(.textSecondary)
+                    )
+                )
+                .focused($focus, equals: .contactEmail)
                 .keyboardType(.emailAddress)
                 .textInputAutocapitalization(.never)
                 .textFieldStyle(
                     ClearableTextFieldStyle(
                         description: "E-mail",
                         descriptionWidth: maxElementWidth,
-                        text: $viewModel.email,
+                        text: $viewModel.contactEmail,
                         hasError: wrongEmail
                     )
                 )
                 .contentShape(.rect)
                 .onTapGesture {
-                    focus = .email
+                    focus = .contactEmail
                 }
 
                 TextField(
                     "",
-                    text: $viewModel.phone,
+                    text: $viewModel.contactPhone,
                     prompt: Text(
                         String(localized: "Optional")
                             .attributedString
                             .setForegroundColor(.textSecondary)
                     )
                 )
-                .focused($focus, equals: .phone)
+                .focused($focus, equals: .contactPhone)
                 .keyboardType(.phonePad)
                 .textFieldStyle(
                     ClearableTextFieldStyle(
                         description: "Phone",
                         descriptionWidth: maxElementWidth,
-                        text: $viewModel.phone,
+                        text: $viewModel.contactPhone,
                         hasError: false
                     )
                 )
                 .contentShape(.rect)
                 .onTapGesture {
-                    focus = .phone
+                    focus = .contactPhone
                 }
 
                 HStack(alignment: .top, spacing: .zero) {
@@ -142,12 +245,12 @@ struct EditClientView: View {
                         .padding(.top, 12)
                         .contentShape(.rect)
                         .onTapGesture {
-                            focus = .address
+                            focus = .contactAddress
                         }
 
                     TextField(
                         "",
-                        text: $viewModel.address,
+                        text: $viewModel.contactAddress,
                         prompt: Text(
                             String(localized: "Optional")
                                 .attributedString
@@ -155,11 +258,11 @@ struct EditClientView: View {
                         ),
                         axis: .vertical
                     )
-                    .focused($focus, equals: .address)
+                    .focused($focus, equals: .contactAddress)
                     .textFieldStyle(DefaultTextFieldStyle(hasError: false))
                     .frame(minHeight: 60, alignment: .top)
                     .onTapGesture {
-                        focus = .address
+                        focus = .contactAddress
                     }
                 }
                 .padding(.leading, 12)
@@ -169,6 +272,14 @@ struct EditClientView: View {
         }
         .overlay {
             ZStack {
+                Text("Name")
+                    .hidden()
+                    .onWidthChange { width in
+                        if width > maxElementWidth {
+                            maxElementWidth = width
+                        }
+                    }
+
                 Text("E-mail")
                     .hidden()
                     .onWidthChange { width in
@@ -199,23 +310,6 @@ struct EditClientView: View {
         .foregroundStyle(.textPrimary)
     }
 
-    private var deleteClient: some View {
-        Button {
-            viewModel.delete()
-        } label: {
-            HStack(spacing: 8) {
-                Icon(systemName: "trash")
-                    .scaledToFit()
-                    .frame(width: 12)
-                Text("Delete client")
-            }
-            .padding(8)
-            .foregroundStyle(.red)
-            .font(.poppins(size: 14, weight: .medium))
-        }
-        .buttonStyle(.icon)
-    }
-
     var body: some View {
         NavigationView {
             VStack(spacing: .zero) {
@@ -229,7 +323,8 @@ struct EditClientView: View {
                     VStack(spacing: 12) {
                         nameSection
                         contactsSection
-                        deleteClient
+                        signatureSection
+                        deleteBusiness
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 16)
@@ -243,20 +338,20 @@ struct EditClientView: View {
                 showNoNameError = false
             }
             .onChange(of: focus) { newValue in
-                if newValue == .email {
+                if newValue == .contactEmail {
                     emailTypingState = .startedTyping
                 } else {
                     emailTypingState = .finishedTyping
-                    if viewModel.email.isEmpty {
+                    if viewModel.contactEmail.isEmpty {
                         // do nothing
                     } else {
-                        if Email(viewModel.email) == nil {
+                        if Email(viewModel.contactEmail) == nil {
                             wrongEmail = true
                         }
                     }
                 }
             }
-            .onChange(of: viewModel.email) { _ in
+            .onChange(of: viewModel.contactEmail) { _ in
                 if emailTypingState == .startedTyping {
                     emailTypingState = .typing
                 }
