@@ -9,7 +9,7 @@
         <attribute name="dateModified" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" attributeType="String"/>
-        <attribute name="signatureURLString" optional="YES" attributeType="String"/>
+        <attribute name="signatureFileName" optional="YES" attributeType="String"/>
     </entity>
     <entity name="CD_Client" representedClassName="CD_Client" syncable="YES">
         <attribute name="address" optional="YES" attributeType="String"/>

@@ -8,7 +8,7 @@ struct Business: Identifiable, Equatable {
     let contactEmail: Email?
     let contactPhone: String?
     let contactAddress: String?
-    let signatureURLString: String?
+    let signatureFileName: String?
     let dateCreated: Date
     let dateModified: Date
 
@@ -21,7 +21,7 @@ struct Business: Identifiable, Equatable {
         self.contactEmail = business.contactEmail
         self.contactPhone = business.contactPhone
         self.contactAddress = business.contactAddress
-        self.signatureURLString = business.signatureURLString
+        self.signatureFileName = business.signatureFileName
         self.dateCreated = business.dateCreated
         self.dateModified = business.dateModified
 

@@ -18,7 +18,8 @@ enum SettingsRoute: Route {
     case itemsList
     case termsOfUse
     case privacyPolicy
-    case edit(CD_Client)
+    case editClient(CD_Client)
+    case editBusiness(CD_Business)
 }
 
 class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
@@ -42,7 +43,7 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
             return .none(ClientsListCoordinator(
                 rootViewController: rootViewController,
                 onClientSelected: { [unowned self] client in
-                    trigger(.edit(client))
+                    trigger(.editClient(client))
                 }
             ))
 
@@ -50,7 +51,7 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
             return .none(BusinessesListCoordinator(
                 rootViewController: rootViewController,
                 onBusinessSelected: { [unowned self] business in
-//                    trigger(.edit(client))
+                    trigger(.editBusiness(business))
                 }
             ))
 
@@ -71,10 +72,16 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
                 title: String(localized: "Privacy Policy")
             ))
 
-        case let .edit(client):
+        case let .editClient(client):
             return .none(EditClientCoordinator(
                 rootViewController: rootViewController,
                 client: client
+            ))
+
+        case let .editBusiness(business):
+            return .none(EditBusinessCoordinator(
+                rootViewController: rootViewController,
+                business: business
             ))
         }
     }

@@ -74,7 +74,6 @@ extension CD_Client {
     }
 
     func update(
-        in context: NSManagedObjectContext,
         name: String,
         email: Email?,
         phone: String?,

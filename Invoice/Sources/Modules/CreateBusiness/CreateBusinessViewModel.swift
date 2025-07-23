@@ -37,11 +37,11 @@ class CreateBusinessViewModel: ObservableObject {
     }
 
     func save() {
-        let signatureURLString: String?
+        let signatureFileName: String?
         if let data = signature?.jpegData(compressionQuality: 1) {
-            signatureURLString = try? FileManager.default.savePhotoJPEGData(data, withName: UUID().uuidString)
+            signatureFileName = try? FileManager.default.savePhotoJPEGData(data, withName: UUID().uuidString)
         } else {
-            signatureURLString = nil
+            signatureFileName = nil
         }
 
         databaseManager.createBusiness(
@@ -50,7 +50,7 @@ class CreateBusinessViewModel: ObservableObject {
             contactEmail: Email(contactEmail),
             contactPhone: contactPhone.nilIfEmpty,
             contactAddress: contactAddress.nilIfEmpty,
-            signatureURLString: signatureURLString
+            signatureFileName: signatureFileName
         )
         router.closeCreateBusiness()
     }
