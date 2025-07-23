@@ -37,7 +37,7 @@ class CD_Business: NSManagedObject, Managed, Identifiable {
     @NSManaged private(set) var contactName: String?
     @NSManaged private(set) var contactPhone: String?
     @NSManaged private(set) var contactAddress: String?
-    @NSManaged private(set) var logoURLString: String?
+    @NSManaged private(set) var signatureURLString: String?
 
     @NSManaged private(set) var dateCreated: Date
     @NSManaged private(set) var dateModified: Date
@@ -55,7 +55,7 @@ extension CD_Business {
         contactEmail: Email?,
         contactPhone: String?,
         contactAddress: String?,
-        logoURLString: String?
+        signatureURLString: String?
     ) -> Self {
         Self.create(in: context) { business in
             business.id = UUID()
@@ -64,7 +64,7 @@ extension CD_Business {
             business.contactEmail = contactEmail
             business.contactPhone = contactPhone
             business.contactAddress = contactAddress
-            business.logoURLString = logoURLString
+            business.signatureURLString = signatureURLString
             business.dateCreated = Date()
             business.dateModified = Date()
         }

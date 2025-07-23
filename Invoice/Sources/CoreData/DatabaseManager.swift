@@ -77,7 +77,7 @@ class DatabaseManager: ObservableObject {
         contactEmail: Email?,
         contactPhone: String?,
         contactAddress: String?,
-        logoURLString: String?
+        signatureURLString: String?
     ) {
         context.performChanges { [self] in
             CD_Business.create(
@@ -87,7 +87,7 @@ class DatabaseManager: ObservableObject {
                 contactEmail: contactEmail,
                 contactPhone: contactPhone,
                 contactAddress: contactAddress,
-                logoURLString: logoURLString
+                signatureURLString: signatureURLString
             )
         }
     }

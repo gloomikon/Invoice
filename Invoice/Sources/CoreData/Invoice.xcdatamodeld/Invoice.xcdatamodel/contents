@@ -3,13 +3,13 @@
     <entity name="CD_Business" representedClassName="CD_Business" syncable="YES">
         <attribute name="contactAddress" optional="YES" attributeType="String"/>
         <attribute name="contactEmail" optional="YES" attributeType="String"/>
-        <attribute name="contactName" attributeType="String"/>
+        <attribute name="contactName" optional="YES" attributeType="String"/>
         <attribute name="contactPhone" optional="YES" attributeType="String"/>
         <attribute name="dateCreated" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="dateModified" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateModified" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="logoURLString" optional="YES" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
+        <attribute name="signatureURLString" optional="YES" attributeType="String"/>
     </entity>
     <entity name="CD_Client" representedClassName="CD_Client" syncable="YES">
         <attribute name="address" optional="YES" attributeType="String"/>

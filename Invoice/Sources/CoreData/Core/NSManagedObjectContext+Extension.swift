@@ -52,6 +52,9 @@ extension NSManagedObjectContext {
             try save()
             return true
         } catch {
+            #if DEBUG
+            print("Rollback. Error: \(error)")
+            #endif
             rollback()
             return false
         }

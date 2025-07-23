@@ -37,7 +37,7 @@ class BusinessesListCoordinator: NavigationCoordinator<BusinessesListRoute> {
             return .dismiss()
 
         case .createBusiness:
-            return .none(CreateClientCoordinator(
+            return .none(CreateBusinessCoordinator(
                 rootViewController: rootViewController
             ))
         }
