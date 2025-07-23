@@ -6,7 +6,6 @@ protocol EditClientRouter {
     func closeEditClient()
 }
 
-
 enum EditClientRoute: Route {
 
     case editClient(CD_Client)

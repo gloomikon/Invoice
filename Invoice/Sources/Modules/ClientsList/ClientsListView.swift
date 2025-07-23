@@ -30,13 +30,24 @@ struct ClientsListView: View {
             Rectangle()
                 .fill(.neutral300)
                 .frame(height: 1)
+            SearchBar("", text: $viewModel.searchText)
+                .searchBarStyle(PrimarySearchBarStyle())
+                .colorScheme(.light)
+                .padding(.horizontal, 8)
+
             if viewModel.clients.isEmpty {
-                EmptyStateView()
+                let text: LocalizedStringKey = if viewModel.searchText.isEmpty {
+                    "Looks like you haven’t added any clients.\nCreate one or import them from your contact list"
+                } else {
+                    "No clients found matching your query"
+                }
+                EmptyStateView(text: text)
             } else {
                 List {
                     Section {
                         ForEach(viewModel.clients) { client in
                             ClientRow(client: client)
+                                .listRowSpacing(.zero)
                                 .listRowInsets(EdgeInsets())
                                 .listRowSeparatorTint(.linkedIn.opacity(0.1))
                                 .listRowBackground(Color.white)
@@ -56,7 +67,6 @@ struct ClientsListView: View {
                             .font(.poppins(size: 12, weight: .medium))
                             .foregroundStyle(.textSecondary)
                     }
-                    .padding(.top, 8)
                 }
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
@@ -113,13 +123,14 @@ struct ClientsListView: View {
                     .frame(width: 16, height: 16)
                     .foregroundStyle(.neutral300)
             }
-            .padding(12)
-            .background(.white, in: .rect(cornerRadius: 16))
+            .padding(.horizontal, 16)
             .contentShape(.rect)
         }
     }
 
     private struct EmptyStateView: View {
+
+        let text: LocalizedStringKey
 
         var body: some View {
             VStack(spacing: 12) {
@@ -127,7 +138,7 @@ struct ClientsListView: View {
                     .scaledToFit()
                     .frame(width: 50)
 
-                Text("Looks like you haven’t added any clients.\nCreate one or import them from your contact list")
+                Text(text)
                     .padding(.horizontal, 20)
                     .spacedFont(.poppins(size: 16, weight: .semiBold))
                     .multilineTextAlignment(.center)
@@ -136,4 +147,25 @@ struct ClientsListView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
+}
+
+private struct PrimarySearchBarStyle: SearchBarStyle {
+
+    func configure(_ searchBar: UISearchBar) {
+        searchBar.searchBarStyle = .minimal
+        searchBar.barTintColor = .textSecondary
+
+        let textField = searchBar.searchTextField
+        textField.backgroundColor = .white
+        textField.font = .poppins(size: 14)
+        textField.textColor = .textPrimary
+        textField.tintColor = .textSecondary
+
+        if let leftIcon = textField.leftView as? UIImageView {
+             leftIcon.tintColor = .textSecondary
+             leftIcon.image = leftIcon.image?.withRenderingMode(.alwaysTemplate)
+         }
+    }
+
+    var delegate: UISearchBarDelegate? { nil }
 }

@@ -6,11 +6,15 @@ class AppWindow: DebugPanelWindow {
 
     @Injected private var appStorage: AppStorage
 
+    private let allowedUDIDs = [
+        "DDC887E6-E6F0-4DFF-9AD8-2BA2B5C5F7AA"
+    ]
+
     override var shouldDisplayPanel: Bool {
         #if DEBUG
         true
         #else
-        false
+        allowedUDIDs.contains(appStorage.deviceUDID)
         #endif
     }
 

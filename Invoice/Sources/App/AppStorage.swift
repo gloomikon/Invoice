@@ -32,11 +32,10 @@ class AppStorage {
         }
     }
 
-    // TODO: - Fix
     private lazy var keychain = KeychainManager(
         settings: KeychainSettings(
-            service: "com.harmonyapps.relief.service",
-            accessGroup: "WGGBM25LU6.com.harmonyapps.relief",
+            service: "com.dmytroyashchenko.invoiceapp",
+            accessGroup: "MTR95823HL.com.dmytroyashchenko.invoiceapp",
             synchronizable: true,
             accessibility: .afterFirstUnlock
         )

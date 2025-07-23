@@ -34,7 +34,7 @@ class CreateClientViewModel: ObservableObject {
     }
 
     func importedContact(_ contact: Contact) {
-        name = contact.familyName + " " + contact.givenName
+        name = contact.givenName + " " + contact.familyName
         email = contact.email ?? ""
         phone = contact.phone ?? ""
         address = contact.address ?? ""
