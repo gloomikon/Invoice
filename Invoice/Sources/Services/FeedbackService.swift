@@ -3,7 +3,7 @@ import StoreKit
 import UIKitExt
 
 @MainActor
-class FeedbackService {
+enum FeedbackService {
 
     @Storage("feedback_was_asked", default: false)
     private static var feedbackWasAsked: Bool

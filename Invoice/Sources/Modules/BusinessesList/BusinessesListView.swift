@@ -1,11 +1,11 @@
 import SwiftUIExt
 
-struct ClientsListView: View {
+struct BusinessesListView: View {
 
-    @ObservedObject var viewModel: ClientsListViewModel
+    @ObservedObject var viewModel: BusinessesListViewModel
 
     private var header: some View {
-        Text("Clients")
+        Text("Businesses")
             .font(.poppins(size: 22, weight: .semiBold))
             .frame(maxWidth: .infinity)
             .overlay(alignment: .leading) {
@@ -35,30 +35,30 @@ struct ClientsListView: View {
                 .colorScheme(.light)
                 .padding(.horizontal, 8)
 
-            if viewModel.clients.isEmpty {
+            if viewModel.businesses.isEmpty {
                 let text: LocalizedStringKey = if viewModel.searchText.isEmpty {
-                    "Looks like you haven’t added any clients.\nCreate one or import them from your contact list"
+                    "You haven’t set up any businesses.\nReady to create one?"
                 } else {
-                    "No clients found matching your query"
+                    "No businesses found matching your query"
                 }
                 EmptyStateView(text: text)
             } else {
                 List {
                     Section {
-                        ForEach(viewModel.clients) { client in
-                            ClientRow(client: client)
+                        ForEach(viewModel.businesses) { business in
+                            BusinessRow(business: business)
                                 .listRowSpacing(.zero)
                                 .listRowInsets(EdgeInsets())
                                 .listRowSeparatorTint(.linkedIn.opacity(0.1))
                                 .listRowBackground(Color.white)
                                 .onTapGesture {
-                                    viewModel.clientSelected(client)
+                                    viewModel.businessSelected(business)
                                 }
                         }
                         .onDelete { indexSet in
                             for index in indexSet {
-                                let id = viewModel.clients[index].id
-                                viewModel.deleteClient(with: id)
+                                let id = viewModel.businesses[index].id
+                                viewModel.deleteBusiness(with: id)
                             }
                         }
                     } header: {
@@ -82,17 +82,8 @@ struct ClientsListView: View {
                 )
                 .frame(height: 14)
                 VStack(spacing: 12) {
-                    if viewModel.clients.isEmpty {
-                        Button("Import from contacts") {
-                            pickContacts { contacts in
-                                viewModel.importedContacts(contacts)
-                            }
-                        }
-                        .buttonStyle(.secondary)
-                    }
-
-                    Button("Create client") {
-                        viewModel.openCreateClient()
+                    Button("Create business") {
+                        viewModel.openCreateBusiness()
                     }
                     .buttonStyle(.primary)
                 }
@@ -102,17 +93,17 @@ struct ClientsListView: View {
                 .background(.backgroundPrimary)
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: viewModel.clients)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.businesses)
         .background(.backgroundPrimary)
     }
 
-    private struct ClientRow: View {
+    private struct BusinessRow: View {
 
-        let client: Client
+        let business: Business
 
         var body: some View {
             HStack {
-                Text(verbatim: client.name)
+                Text(verbatim: business.name)
                     .lineLimit(1)
                     .font(.poppins(size: 14, weight: .medium))
                     .foregroundStyle(.textPrimary)
@@ -134,7 +125,7 @@ struct ClientsListView: View {
 
         var body: some View {
             VStack(spacing: 12) {
-                Icon(systemName: "person.and.background.dotted")
+                Icon(systemName: "briefcase")
                     .scaledToFit()
                     .frame(width: 50)
 

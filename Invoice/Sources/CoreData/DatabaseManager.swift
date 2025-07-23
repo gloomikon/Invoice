@@ -91,6 +91,15 @@ class DatabaseManager: ObservableObject {
             )
         }
     }
+
+    @MainActor
+    func deleteBusiness(with id: UUID) {
+        guard let target = businesses.first(where: { $0.id == id }) else { return }
+
+        context.performChanges { [self] in
+            target.delete(in: context)
+        }
+    }
 }
 
 // MARK: - Private

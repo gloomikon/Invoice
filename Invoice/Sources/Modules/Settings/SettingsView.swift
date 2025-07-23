@@ -32,9 +32,9 @@ struct SettingsView: View {
     private var mainSection: some View {
         Section {
             Row(
-                title: "Clients list",
+                title: "Clients",
                 subtitle: nil,
-                icon: Icon(systemName: "briefcase")
+                icon: Icon(systemName: "person.and.background.dotted")
                     .scaledToFit()
                     .foregroundStyle(.linkedIn)
                     .frame(width: 18, height: 18)
@@ -46,9 +46,9 @@ struct SettingsView: View {
             }
 
             Row(
-                title: "Issuers list",
+                title: "Businesses",
                 subtitle: nil,
-                icon: Icon(systemName: "person.and.background.dotted")
+                icon: Icon(systemName: "briefcase")
                     .scaledToFit()
                     .foregroundStyle(.linkedIn)
                     .frame(width: 20, height: 20)
@@ -56,11 +56,11 @@ struct SettingsView: View {
                     .background(.linkedIn.opacity(0.1), in: .rect(cornerRadius: 8)),
                 trailingIcon: Icon(systemName: "chevron.forward")
             ) {
-                viewModel.openIssuersList()
+                viewModel.openBusinessesList()
             }
 
             Row(
-                title: "Items list",
+                title: "Items",
                 subtitle: nil,
                 icon: Icon(systemName: "shippingbox")
                     .scaledToFit()

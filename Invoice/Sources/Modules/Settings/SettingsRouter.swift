@@ -6,7 +6,7 @@ protocol SettingsRouter {
     func openPrivacyPolicy()
     func openTermsOfUse()
     func openClientsList()
-    func openIssuersList()
+    func openBusinessesList()
     func openItemsList()
 }
 
@@ -14,7 +14,7 @@ enum SettingsRoute: Route {
     case settings
     case pop
     case clientsList
-    case issuerList
+    case businessesList
     case itemsList
     case termsOfUse
     case privacyPolicy
@@ -46,8 +46,13 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
                 }
             ))
 
-        case .issuerList:
-            return .push(UIViewController())
+        case .businessesList:
+            return .none(BusinessesListCoordinator(
+                rootViewController: rootViewController,
+                onBusinessSelected: { [unowned self] business in
+//                    trigger(.edit(client))
+                }
+            ))
 
         case .itemsList:
             return .push(UIViewController())
@@ -93,8 +98,8 @@ extension SettingsCoordinator: SettingsRouter {
         trigger(.clientsList)
     }
 
-    func openIssuersList() {
-        trigger(.issuerList)
+    func openBusinessesList() {
+        trigger(.businessesList)
     }
 
     func openItemsList() {
