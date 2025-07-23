@@ -9,8 +9,16 @@ class CD_Client: NSManagedObject, Managed, Identifiable {
         NSSortDescriptor(key: #keyPath(CD_Client.dateModified), ascending: false)
     }
 
+    static var nameSortDescriptor: NSSortDescriptor {
+        NSSortDescriptor(
+            key: #keyPath(CD_Client.name),
+            ascending: true,
+            selector: #selector(NSString.localizedCaseInsensitiveCompare(_:))
+        )
+    }
+
     static var defaultSortDescriptors: [NSSortDescriptor] {
-        [dateModifiedSortDescriptor]
+        [nameSortDescriptor]
     }
 
     @NSManaged private(set) var id: String

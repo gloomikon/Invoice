@@ -102,6 +102,7 @@ struct SettingsView: View {
                     .background(.linkedIn.opacity(0.1), in: .rect(cornerRadius: 8)),
                 trailingIcon: Icon(.copySquares)
             ) {
+                HapticPlayer.fire(.selection)
                 UIPasteboard.general.string = viewModel.udid
                 userIDCopiedToastIsShown = true
             }
@@ -197,9 +198,6 @@ struct SettingsView: View {
         .toast(
             isPresented: $userIDCopiedToastIsShown,
             location: .bottom,
-            onAppear: {
-                HapticPlayer.fire(.selection)
-            },
             toast: {
                 ToastView(title: "Copied to clipboard")
             }

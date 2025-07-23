@@ -13,7 +13,22 @@ class ClientsListViewModel: ObservableObject {
 
     // MARK: - Public properties
 
-    @Published var clients: [Client] = []
+    @Published private var allClients: [Client] = []
+    @Published var searchText = ""
+
+    var clients: [Client] {
+        guard !searchText.isEmpty else { return allClients }
+
+        let query = searchText.lowercased(with: .current)
+
+        return allClients.filter { client in
+            let nameContains = client.name.localizedCaseInsensitiveContains(query)
+            let emailContains = client.email?.email.localizedCaseInsensitiveContains(query) == true
+            let phoneContains = client.phone?.contains(query) == true
+
+            return nameContains || emailContains || phoneContains
+        }
+    }
 
     init(
         router: ClientsListRouter,
@@ -28,7 +43,7 @@ class ClientsListViewModel: ObservableObject {
     private func bind() {
         databaseManager.$clients
             .map { $0.map(Client.init) }
-            .assign(to: &$clients)
+            .assign(to: &$allClients)
     }
 
     func close() {
@@ -43,7 +58,7 @@ class ClientsListViewModel: ObservableObject {
         contacts.forEach { contact in
             databaseManager.createClient(
                 id: contact.id,
-                name: contact.familyName + " " + contact.givenName,
+                name: contact.givenName + " " + contact.familyName,
                 email: contact.email.flatMap { Email($0) },
                 phone: contact.phone,
                 address: contact.address
