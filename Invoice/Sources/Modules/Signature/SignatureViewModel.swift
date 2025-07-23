@@ -1,7 +1,8 @@
 import Combine
 import Depin
-import UIKit
+import SwiftUIExt
 
+@MainActor
 class SignatureViewModel: ObservableObject {
 
     @Injected private var appStorage: AppStorage
