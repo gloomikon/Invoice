@@ -1,6 +1,11 @@
 import Foundation
 import UIKit
 
+enum DiscountType {
+    case percentage(amount: Double)
+    case fixed(amount: Double)
+}
+
 struct InvoiceInput {
 
     let id: String
@@ -25,11 +30,6 @@ struct InvoiceInput {
 // MARK: - InvoiceInput + Internal Types
 
 extension InvoiceInput {
-
-    enum DiscountType {
-        case percentage(amount: Double)
-        case fixed(amount: Double)
-    }
 
     enum TaxType {
         case inclusive(amount: Double)
@@ -68,42 +68,6 @@ extension InvoiceInput {
     struct Currency {
         let code: String
         let symbol: String
-    }
-
-    struct WorkItem {
-
-        enum UnitType {
-            case item
-            case hour
-            case day
-        }
-
-        let name: String
-        let description: String?
-
-        let price: Double
-        let quantity: Double
-        let unitType: UnitType
-        let discount: DiscountType?
-
-        let taxable: Bool
-        let saveToCatalog: Bool
-
-        var amount: Double {
-            let totalPrice = price * quantity
-            let itemDiscount: Double
-            if let discount = discount {
-                switch discount {
-                case .fixed(let value):
-                    itemDiscount = value
-                case .percentage(let value):
-                    itemDiscount = totalPrice * (value / 100)
-                }
-            } else {
-                itemDiscount = 0
-            }
-            return totalPrice - itemDiscount
-        }
     }
 }
 

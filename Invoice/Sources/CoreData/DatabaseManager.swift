@@ -8,6 +8,7 @@ class DatabaseManager: ObservableObject {
 
     @MainActor @Published var clients: [CD_Client] = []
     @MainActor @Published var businesses: [CD_Business] = []
+    @MainActor @Published var workItems: [CD_WorkItem] = []
 
     private var context: NSManagedObjectContext {
         coreDataStack.managedContext
@@ -15,6 +16,7 @@ class DatabaseManager: ObservableObject {
 
     private var clientsFRC: NSFetchedResultsController<CD_Client>?
     private var businessesFRC: NSFetchedResultsController<CD_Business>?
+    private var workItemsFRC: NSFetchedResultsController<CD_WorkItem>?
 
     // MARK: - Public
 
@@ -22,7 +24,10 @@ class DatabaseManager: ObservableObject {
         try await coreDataStack.load()
         observeClients()
         observeBusinesses()
+        observeWorkItems()
     }
+
+    // MARK: - Clients
 
     func createClient(
         id: String? = nil,
@@ -69,6 +74,8 @@ class DatabaseManager: ObservableObject {
             target.delete(in: context)
         }
     }
+
+    // MARK: - Businesses
 
     func createBusiness(
         name: String,
@@ -120,6 +127,63 @@ class DatabaseManager: ObservableObject {
             target.delete(in: context)
         }
     }
+
+    // MARK: - Items
+
+    func createWorkItem(
+        name: String,
+        description: String?,
+        price: Double,
+        quantity: Int,
+        unitType: WorkItem.UnitType,
+        discount: DiscountType?,
+        taxable: Bool
+    ) {
+        context.performChanges { [self] in
+            CD_WorkItem.create(
+                in: context,
+                name: name,
+                description: description,
+                price: price,
+                quantity: quantity,
+                unitType: unitType,
+                discount: discount,
+                taxable: taxable
+            )
+        }
+    }
+
+    func updateWorkItem(
+        _ item: CD_WorkItem,
+        name: String,
+        description: String?,
+        price: Double,
+        quantity: Int,
+        unitType: WorkItem.UnitType,
+        discount: DiscountType?,
+        taxable: Bool
+    ) {
+        context.performChanges {
+            item.update(
+                name: name,
+                description: description,
+                price: price,
+                quantity: quantity,
+                unitType: unitType,
+                discount: discount,
+                taxable: taxable
+            )
+        }
+    }
+
+    @MainActor
+    func deleteWorkItem(with id: UUID) {
+        guard let target = workItems.first(where: { $0.id == id }) else { return }
+
+        context.performChanges { [self] in
+            target.delete(in: context)
+        }
+    }
 }
 
 // MARK: - Private
@@ -164,6 +228,25 @@ private extension DatabaseManager {
         }
     }
 
+    func observeWorkItems() {
+        let request = CD_WorkItem.sortedFetchRequest
+        request.returnsObjectsAsFaults = false
+        let frc = NSFetchedResultsController(
+            fetchRequest: request,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: "work_items"
+        )
+        self.workItemsFRC = frc
+        let stream = FetchResultStream.make(for: frc)
+        Task { @MainActor [weak self] in
+            for await _ in stream {
+                guard let self else { return }
+                updateWorkItemsMeta()
+            }
+        }
+    }
+
     @MainActor
     func updateClientsMeta() {
         guard let clients = clientsFRC?.sections?.first?.objects as? [CD_Client] else {
@@ -178,5 +261,13 @@ private extension DatabaseManager {
             return
         }
         self.businesses = businesses
+    }
+
+    @MainActor
+    func updateWorkItemsMeta() {
+        guard let items = workItemsFRC?.sections?.first?.objects as? [CD_WorkItem] else {
+            return
+        }
+        self.workItems = items
     }
 }

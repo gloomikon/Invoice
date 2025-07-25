@@ -846,8 +846,7 @@ enum InputMock {
                     quantity: 2,
                     unitType: .item,
                     discount: .percentage(amount: 10),
-                    taxable: true,
-                    saveToCatalog: true
+                    taxable: true
                 ),
                 .init(
                     name: "A lot of Some Work 2 \ncausing 2 lines of text",
@@ -856,8 +855,7 @@ enum InputMock {
                     quantity: 9,
                     unitType: .hour,
                     discount: .fixed(amount: 50),
-                    taxable: true,
-                    saveToCatalog: true
+                    taxable: true
                 )
             ],
             currency: .init(code: "403", symbol: "$"),
