@@ -1,11 +1,14 @@
-struct WorkItem {
+import Foundation
 
-    enum UnitType: String {
+struct WorkItem: Identifiable, Equatable {
+
+    enum UnitType: String, Equatable {
         case item
         case hour
         case day
     }
 
+    let id: UUID
     let name: String
     let description: String?
 
@@ -39,6 +42,7 @@ struct WorkItem {
 extension WorkItem {
 
     init(_ item: CD_WorkItem) {
+        self.id = item.id
         self.name = item.name
         self.description = item.itemDescription
         self.price = item.price

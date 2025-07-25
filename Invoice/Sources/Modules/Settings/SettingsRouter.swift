@@ -56,7 +56,12 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
             ))
 
         case .itemsList:
-            return .push(UIViewController())
+            return .none(WorkItemsListCoordinator(
+                rootViewController: rootViewController,
+                onWorkItemSelected: { [unowned self] workItem in
+
+                }
+            ))
 
         case .termsOfUse:
             return .none(WebPageCoordinator(

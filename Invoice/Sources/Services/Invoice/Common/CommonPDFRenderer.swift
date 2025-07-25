@@ -840,6 +840,7 @@ enum InputMock {
             ),
             workItems: [
                 .init(
+                    id: UUID(),
                     name: "Some Work",
                     description: "Some work finished some time ago \nand some additional work too",
                     price: 500,
@@ -849,6 +850,7 @@ enum InputMock {
                     taxable: true
                 ),
                 .init(
+                    id: UUID(),
                     name: "A lot of Some Work 2 \ncausing 2 lines of text",
                     description: "Some work finished some time ago too",
                     price: 100,

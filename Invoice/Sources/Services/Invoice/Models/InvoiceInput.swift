@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-enum DiscountType {
+enum DiscountType: Equatable {
     case percentage(amount: Double)
     case fixed(amount: Double)
 }
