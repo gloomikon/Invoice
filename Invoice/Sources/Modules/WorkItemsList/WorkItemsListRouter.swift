@@ -37,10 +37,9 @@ class WorkItemsListCoordinator: NavigationCoordinator<WorkItemsListRoute> {
             return .dismiss()
 
         case .createWorkItem:
-            return .none()
-//            return .none(CreateWorkItemCoordinator(
-//                rootViewController: rootViewController
-//            ))
+            return .none(CreateWorkItemCoordinator(
+                rootViewController: rootViewController
+            ))
         }
     }
 }

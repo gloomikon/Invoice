@@ -1,4 +1,4 @@
-enum Currency: String, CaseIterable {
+enum Currency: String, CaseIterable, Codable {
     case aed
     case afn
     case all

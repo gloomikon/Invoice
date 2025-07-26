@@ -2,10 +2,21 @@ import Foundation
 
 struct WorkItem: Identifiable, Equatable {
 
-    enum UnitType: String, Equatable {
+    enum UnitType: String, Equatable, CaseIterable {
         case item
         case hour
         case day
+
+        var title: String {
+            switch self {
+            case .item:
+                String(localized: "Items")
+            case .hour:
+                String(localized: "Hours")
+            case .day:
+                String(localized: "Days")
+            }
+        }
     }
 
     let id: UUID
@@ -14,7 +25,7 @@ struct WorkItem: Identifiable, Equatable {
 
     let price: Double
     let quantity: Int
-    let unitType: UnitType
+    let unitType: UnitType?
     let discount: DiscountType?
 
     let taxable: Bool

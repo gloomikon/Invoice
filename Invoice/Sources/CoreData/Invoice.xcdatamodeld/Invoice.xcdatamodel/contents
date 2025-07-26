@@ -29,6 +29,6 @@
         <attribute name="price" attributeType="Double"/>
         <attribute name="quantity" attributeType="Integer 32" usesScalarValueType="YES"/>
         <attribute name="taxable" attributeType="Boolean"/>
-        <attribute name="unitType" attributeType="String"/>
+        <attribute name="unitType" optional="YES" attributeType="String"/>
     </entity>
 </model>

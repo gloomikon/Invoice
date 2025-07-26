@@ -135,7 +135,7 @@ class DatabaseManager: ObservableObject {
         description: String?,
         price: Double,
         quantity: Int,
-        unitType: WorkItem.UnitType,
+        unitType: WorkItem.UnitType?,
         discount: DiscountType?,
         taxable: Bool
     ) {
@@ -159,7 +159,7 @@ class DatabaseManager: ObservableObject {
         description: String?,
         price: Double,
         quantity: Int,
-        unitType: WorkItem.UnitType,
+        unitType: WorkItem.UnitType?,
         discount: DiscountType?,
         taxable: Bool
     ) {

@@ -22,18 +22,20 @@ class CD_WorkItem: NSManagedObject, Managed, Identifiable {
 
     private static let unitTypeKey = "unitType"
 
-    @NSManaged private var primitiveUnitType: String
+    @NSManaged private var primitiveUnitType: String?
 
-    var unitType: WorkItem.UnitType {
+    var unitType: WorkItem.UnitType? {
         get {
             willAccessValue(forKey: Self.unitTypeKey)
-            let value = WorkItem.UnitType(rawValue: primitiveUnitType) ?? .item
+            let value = primitiveUnitType.flatMap {
+                WorkItem.UnitType(rawValue: $0)
+            }
             didAccessValue(forKey: Self.unitTypeKey)
             return value
         }
         set {
             willChangeValue(forKey: Self.unitTypeKey)
-            primitiveUnitType = newValue.rawValue
+            primitiveUnitType = newValue?.rawValue
             didChangeValue(forKey: Self.unitTypeKey)
         }
     }
@@ -82,7 +84,7 @@ extension CD_WorkItem {
         description: String?,
         price: Double,
         quantity: Int,
-        unitType: WorkItem.UnitType,
+        unitType: WorkItem.UnitType?,
         discount: DiscountType?,
         taxable: Bool
     ) -> Self {
@@ -104,7 +106,7 @@ extension CD_WorkItem {
         description: String?,
         price: Double,
         quantity: Int,
-        unitType: WorkItem.UnitType,
+        unitType: WorkItem.UnitType?,
         discount: DiscountType?,
         taxable: Bool
     ) {
