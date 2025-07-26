@@ -840,24 +840,24 @@ enum InputMock {
             ),
             workItems: [
                 .init(
+                    id: UUID(),
                     name: "Some Work",
                     description: "Some work finished some time ago \nand some additional work too",
                     price: 500,
                     quantity: 2,
                     unitType: .item,
                     discount: .percentage(amount: 10),
-                    taxable: true,
-                    saveToCatalog: true
+                    taxable: true
                 ),
                 .init(
+                    id: UUID(),
                     name: "A lot of Some Work 2 \ncausing 2 lines of text",
                     description: "Some work finished some time ago too",
                     price: 100,
                     quantity: 9,
                     unitType: .hour,
                     discount: .fixed(amount: 50),
-                    taxable: true,
-                    saveToCatalog: true
+                    taxable: true
                 )
             ],
             currency: .init(code: "403", symbol: "$"),

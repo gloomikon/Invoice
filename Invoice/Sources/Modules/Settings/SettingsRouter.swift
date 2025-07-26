@@ -20,6 +20,7 @@ enum SettingsRoute: Route {
     case privacyPolicy
     case editClient(CD_Client)
     case editBusiness(CD_Business)
+    case editWorkItem(CD_WorkItem)
 }
 
 class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
@@ -56,7 +57,12 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
             ))
 
         case .itemsList:
-            return .push(UIViewController())
+            return .none(WorkItemsListCoordinator(
+                rootViewController: rootViewController,
+                onWorkItemSelected: { [unowned self] workItem in
+                    trigger(.editWorkItem(workItem))
+                }
+            ))
 
         case .termsOfUse:
             return .none(WebPageCoordinator(
@@ -82,6 +88,12 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
             return .none(EditBusinessCoordinator(
                 rootViewController: rootViewController,
                 business: business
+            ))
+
+        case let .editWorkItem(workItem):
+            return .none(EditWorkItemCoordinator(
+                rootViewController: rootViewController,
+                workItem: workItem
             ))
         }
     }

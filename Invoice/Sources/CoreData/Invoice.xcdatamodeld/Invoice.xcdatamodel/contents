@@ -20,4 +20,15 @@
         <attribute name="name" attributeType="String"/>
         <attribute name="phone" optional="YES" attributeType="String"/>
     </entity>
+    <entity name="CD_WorkItem" representedClassName="CD_WorkItem" syncable="YES">
+        <attribute name="dateCreated" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="discount" optional="YES" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="itemDescription" optional="YES" attributeType="String"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="price" attributeType="Double"/>
+        <attribute name="quantity" attributeType="Integer 32" usesScalarValueType="YES"/>
+        <attribute name="taxable" attributeType="Boolean"/>
+        <attribute name="unitType" optional="YES" attributeType="String"/>
+    </entity>
 </model>
