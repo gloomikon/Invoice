@@ -17,7 +17,7 @@ class MainCoordinator: NavigationCoordinator<MainRoute> {
 
         case .main:
             let module = MainModule(router: self)
-            return .set(module.build())
+            return .set(module.build(), animation: .fade)
 
         case .settings:
             return .none(SettingsCoordinator(rootViewController: rootViewController))
