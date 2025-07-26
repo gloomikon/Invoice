@@ -5,19 +5,26 @@ import UIKitExt
 struct Contact: Identifiable {
 
     let id: String
-    let givenName: String
-    let familyName: String
+    let name: String
     let email: String?
     let phone: String?
     let address: String?
 
     init(contact: CNContact) {
         self.id = contact.identifier
-        self.givenName = contact.givenName
-        self.familyName = contact.familyName
+
+        let fullName = [contact.givenName, contact.familyName]
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+
+        self.name = if fullName.isEmpty {
+            contact.organizationName.trimmingCharacters(in: .whitespacesAndNewlines)
+        } else {
+            fullName
+        }
 
         self.email = contact.emailAddresses.first?.value as String?
-
         self.phone = contact.phoneNumbers.first?.value.stringValue
 
         if let postal = contact.postalAddresses.first?.value {

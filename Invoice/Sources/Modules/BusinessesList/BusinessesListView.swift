@@ -30,10 +30,6 @@ struct BusinessesListView: View {
             Rectangle()
                 .fill(.neutral300)
                 .frame(height: 1)
-            SearchBar("", text: $viewModel.searchText)
-                .searchBarStyle(PrimarySearchBarStyle())
-                .colorScheme(.light)
-                .padding(.horizontal, 8)
 
             if viewModel.businesses.isEmpty {
                 let text: LocalizedStringKey = if viewModel.searchText.isEmpty {
@@ -43,6 +39,11 @@ struct BusinessesListView: View {
                 }
                 EmptyStateView(text: text)
             } else {
+                SearchBar("", text: $viewModel.searchText)
+                    .searchBarStyle(PrimarySearchBarStyle())
+                    .colorScheme(.light)
+                    .padding(.horizontal, 8)
+
                 List {
                     Section {
                         ForEach(viewModel.businesses) { business in
@@ -114,7 +115,7 @@ struct BusinessesListView: View {
                     .frame(width: 16, height: 16)
                     .foregroundStyle(.neutral300)
             }
-            .padding(.horizontal, 16)
+            .padding(16)
             .contentShape(.rect)
         }
     }

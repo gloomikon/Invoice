@@ -71,15 +71,6 @@ struct CreateWorkItemView: View {
         .background(.white, in: .rect(cornerRadius: 16))
     }
 
-    private var formatter: NumberFormatter {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 2
-        formatter.usesGroupingSeparator = false
-        return formatter
-     }
-
     private var price: some View {
         HStack(spacing: .zero) {
             Text(currency.abbreviation)
@@ -88,7 +79,7 @@ struct CreateWorkItemView: View {
             TextField(
                 "",
                 value: $viewModel.price,
-                formatter: formatter,
+                format: .number,
                 prompt: Text("0")
                     .foregroundColor(.textSecondary)
             )
@@ -102,7 +93,7 @@ struct CreateWorkItemView: View {
         TextField(
             "",
             value: $viewModel.quantity,
-            formatter: formatter,
+            format: .number,
             prompt: Text("1")
                 .foregroundColor(.textSecondary)
         )
@@ -243,7 +234,7 @@ struct CreateWorkItemView: View {
             TextField(
                 "",
                 value: $viewModel.discount,
-                formatter: formatter,
+                format: .number,
                 prompt: Text("0")
                     .foregroundColor(.textSecondary)
             )
@@ -318,9 +309,6 @@ struct CreateWorkItemView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .onTapGesture {
-                focus = nil
-            }
             .onChange(of: viewModel.name) { _ in
                 showNoNameError = false
             }
@@ -346,7 +334,13 @@ struct CreateWorkItemView: View {
                     .background(.backgroundPrimary)
                 }
             }
-            .background(.backgroundPrimary)
+            .background {
+                Color.backgroundPrimary
+                    .onTapGesture {
+                        focus = nil
+                    }
+                    .ignoresSafeArea()
+            }
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()

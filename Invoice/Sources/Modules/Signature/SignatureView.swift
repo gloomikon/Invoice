@@ -41,6 +41,7 @@ struct SignatureView: View {
                 ) { signatureImage in
                     viewModel.createSignatureTapped(signature: signatureImage)
                 }
+                .colorScheme(.light)
                 .frame(height: 200)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay(

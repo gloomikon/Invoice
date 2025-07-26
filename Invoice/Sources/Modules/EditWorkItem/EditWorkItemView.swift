@@ -9,7 +9,7 @@ struct EditWorkItemView: View {
     @Storage(CurrencyStorageKey.self) private var currency
 
     private var header: some View {
-        Text("New item")
+        Text("Edit item")
             .font(.poppins(size: 22, weight: .semiBold))
             .frame(maxWidth: .infinity)
             .overlay(alignment: .leading) {
@@ -71,15 +71,6 @@ struct EditWorkItemView: View {
         .background(.white, in: .rect(cornerRadius: 16))
     }
 
-    private var formatter: NumberFormatter {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 2
-        formatter.usesGroupingSeparator = false
-        return formatter
-     }
-
     private var price: some View {
         HStack(spacing: .zero) {
             Text(currency.abbreviation)
@@ -88,7 +79,7 @@ struct EditWorkItemView: View {
             TextField(
                 "",
                 value: $viewModel.price,
-                formatter: formatter,
+                format: .number,
                 prompt: Text("0")
                     .foregroundColor(.textSecondary)
             )
@@ -102,7 +93,7 @@ struct EditWorkItemView: View {
         TextField(
             "",
             value: $viewModel.quantity,
-            formatter: formatter,
+            format: .number,
             prompt: Text("1")
                 .foregroundColor(.textSecondary)
         )
@@ -243,7 +234,7 @@ struct EditWorkItemView: View {
             TextField(
                 "",
                 value: $viewModel.discount,
-                formatter: formatter,
+                format: .number,
                 prompt: Text("0")
                     .foregroundColor(.textSecondary)
             )
@@ -296,6 +287,23 @@ struct EditWorkItemView: View {
             .padding(.horizontal, 12)
     }
 
+    private var deleteItem: some View {
+        Button {
+            viewModel.delete()
+        } label: {
+            HStack(spacing: 8) {
+                Icon(systemName: "trash")
+                    .scaledToFit()
+                    .frame(width: 12)
+                Text("Delete item")
+            }
+            .padding(8)
+            .foregroundStyle(.red)
+            .font(.poppins(size: 14, weight: .medium))
+        }
+        .buttonStyle(.icon)
+    }
+
     var body: some View {
         NavigationView {
             VStack(spacing: .zero) {
@@ -311,15 +319,13 @@ struct EditWorkItemView: View {
                         infoSection
                         discountSection
                         taxSection
+                        deleteItem
                     }
                     .animation(.easeInOut(duration: 0.2), value: viewModel.hasDiscount)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 16)
                 }
                 .scrollIndicators(.hidden)
-            }
-            .onTapGesture {
-                focus = nil
             }
             .onChange(of: viewModel.name) { _ in
                 showNoNameError = false
@@ -346,7 +352,13 @@ struct EditWorkItemView: View {
                     .background(.backgroundPrimary)
                 }
             }
-            .background(.backgroundPrimary)
+            .background {
+                Color.backgroundPrimary
+                    .onTapGesture {
+                        focus = nil
+                    }
+                    .ignoresSafeArea()
+            }
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()

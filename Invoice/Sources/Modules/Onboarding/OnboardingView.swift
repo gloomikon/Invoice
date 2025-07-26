@@ -1,3 +1,4 @@
+import Core
 import SwiftUIExt
 
 struct OnboardingView: View {
@@ -34,6 +35,7 @@ struct OnboardingView: View {
                 .padding(.top, 24)
 
             Button("Continue") {
+                HapticPlayer.fire(.selection)
                 viewModel.openNextPage()
             }
             .buttonStyle(.primary)

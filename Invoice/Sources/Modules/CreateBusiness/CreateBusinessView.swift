@@ -41,7 +41,6 @@ struct CreateBusinessView: View {
                 .textCase(nil)
                 .font(.poppins(size: 12, weight: .medium))
                 .foregroundStyle(.textSecondary)
-                .padding(.leading, 12)
 
             TextField(
                 "",
