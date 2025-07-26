@@ -58,7 +58,7 @@ class ClientsListViewModel: ObservableObject {
         contacts.forEach { contact in
             databaseManager.createClient(
                 id: contact.id,
-                name: contact.givenName + " " + contact.familyName,
+                name: contact.name,
                 email: contact.email.flatMap { Email($0) },
                 phone: contact.phone,
                 address: contact.address

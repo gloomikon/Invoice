@@ -1,3 +1,4 @@
+import Core
 import SwiftUIExt
 
 struct WorkItemsListView: View {
@@ -30,10 +31,6 @@ struct WorkItemsListView: View {
             Rectangle()
                 .fill(.neutral300)
                 .frame(height: 1)
-            SearchBar("", text: $viewModel.searchText)
-                .searchBarStyle(PrimarySearchBarStyle())
-                .colorScheme(.light)
-                .padding(.horizontal, 8)
 
             if viewModel.workItems.isEmpty {
                 let text: LocalizedStringKey = if viewModel.searchText.isEmpty {
@@ -43,6 +40,11 @@ struct WorkItemsListView: View {
                 }
                 EmptyStateView(text: text)
             } else {
+                SearchBar("", text: $viewModel.searchText)
+                    .searchBarStyle(PrimarySearchBarStyle())
+                    .colorScheme(.light)
+                    .padding(.horizontal, 8)
+
                 List {
                     Section {
                         ForEach(viewModel.workItems) { workItem in
@@ -82,7 +84,7 @@ struct WorkItemsListView: View {
                 )
                 .frame(height: 14)
                 VStack(spacing: 12) {
-                    Button("Create") {
+                    Button("Create item") {
                         viewModel.openCreateWorkItem()
                     }
                     .buttonStyle(.primary)
@@ -99,15 +101,24 @@ struct WorkItemsListView: View {
 
     private struct WorkItemRow: View {
 
+        @Storage(CurrencyStorageKey.self) private var currency
+
         let workItem: WorkItem
 
         var body: some View {
             HStack {
-                Text(verbatim: workItem.name)
-                    .lineLimit(1)
-                    .font(.poppins(size: 14, weight: .medium))
-                    .foregroundStyle(.textPrimary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(verbatim: workItem.name)
+                        .lineLimit(1)
+                        .font(.poppins(size: 14, weight: .medium))
+                        .foregroundStyle(.textPrimary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    let price = String(format: "%.2f", workItem.price)
+                    Text(verbatim: "\(price) \(currency.abbreviation)")
+                        .font(.poppins(size: 12, weight: .medium))
+                        .foregroundStyle(.textSecondary)
+                }
 
                 Icon(systemName: "chevron.forward")
                     .scaledToFit()
@@ -115,6 +126,7 @@ struct WorkItemsListView: View {
                     .foregroundStyle(.neutral300)
             }
             .padding(.horizontal, 16)
+            .padding(.vertical, 8)
             .contentShape(.rect)
         }
     }
