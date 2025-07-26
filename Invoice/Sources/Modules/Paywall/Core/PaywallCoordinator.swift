@@ -11,6 +11,7 @@ enum PaywallRoute: Route {
 enum PaywallTrigger {
     case onboarding
     case splash
+    case settings
 }
 
 class PaywallCoordinator: NavigationCoordinator<PaywallRoute> {
@@ -57,6 +58,8 @@ class PaywallCoordinator: NavigationCoordinator<PaywallRoute> {
                     .none(MainCoordinator(rootViewController: rootViewController)),
                     .dismiss()
                 )
+            case .settings:
+                return .dismiss()
             }
         }
     }

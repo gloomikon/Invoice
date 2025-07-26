@@ -75,9 +75,9 @@ class PurchaseManager {
     func fetchSubscriptionStatus() async {
         tryAwait {
             let customerInfo = try await Purchases.shared.customerInfo()
-            appStorage.isPremium = customerInfo.entitlements[Entitlement.pro]?.isActive == true
+            appStorage.setPremium( customerInfo.entitlements[Entitlement.pro]?.isActive == true)
         } onCatch: { _ in
-            appStorage.isPremium = false
+            appStorage.setPremium(false)
         }
     }
 

@@ -5,6 +5,36 @@ import UIKit
 
 class AppStorage {
 
+    @Published private(set) var isPremium = false
+
+    func setPremium(_ isPremium: Bool) {
+        realIsPremium = isPremium
+        self.isPremium = checkPremium()
+    }
+
+    init() {
+        isPremium = checkPremium()
+
+        bind()
+    }
+
+    private func checkPremium() -> Bool {
+        switch DebugPanelStorage.shared.boolRemoteValue(for: "debug_is_premium") {
+        case .default:
+            realIsPremium
+        case .selected(let value):
+            value
+        }
+    }
+
+    private func bind() {
+        DebugPanelStorage.shared.didChangeBoolRemotePublisher(for: "debug_is_premium")
+            .map { [unowned self] _ in
+                checkPremium()
+            }
+            .assign(to: &$isPremium)
+    }
+
     private enum Constant {
         static let deviceUDID = "deviceUDID"
         static let signatureFileName = "signature.png"
@@ -17,20 +47,6 @@ class AppStorage {
     var didSeeMain
 
     private var realIsPremium = false
-
-    var isPremium: Bool {
-        get {
-            switch DebugPanelStorage.shared.boolRemoteValue(for: "debug_is_premium") {
-            case .default:
-                realIsPremium
-            case .selected(let value):
-                value
-            }
-        }
-        set {
-            realIsPremium = newValue
-        }
-    }
 
     private lazy var keychain = KeychainManager(
         settings: KeychainSettings(

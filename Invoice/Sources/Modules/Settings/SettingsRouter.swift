@@ -8,6 +8,7 @@ protocol SettingsRouter {
     func openClientsList()
     func openBusinessesList()
     func openItemsList()
+    func openPaywall()
 }
 
 enum SettingsRoute: Route {
@@ -21,6 +22,7 @@ enum SettingsRoute: Route {
     case editClient(CD_Client)
     case editBusiness(CD_Business)
     case editWorkItem(CD_WorkItem)
+    case paywall
 }
 
 class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
@@ -95,6 +97,12 @@ class SettingsCoordinator: NavigationCoordinator<SettingsRoute> {
                 rootViewController: rootViewController,
                 workItem: workItem
             ))
+
+        case .paywall:
+            return .none(PaywallCoordinator(
+                rootViewController: rootViewController,
+                paywallTrigger: .settings
+            ))
         }
     }
 }
@@ -123,5 +131,9 @@ extension SettingsCoordinator: SettingsRouter {
 
     func openItemsList() {
         trigger(.itemsList)
+    }
+
+    func openPaywall() {
+        trigger(.paywall)
     }
 }
