@@ -29,6 +29,20 @@ struct SettingsView: View {
             .foregroundStyle(.textPrimary)
     }
 
+    @ViewBuilder
+    private var premiumSection: some View {
+        if !viewModel.isPremium {
+            Button {
+                viewModel.openPaywall()
+            } label: {
+                PremiumBanner()
+            }
+            .buttonStyle(.icon)
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+        }
+    }
+
     private var mainSection: some View {
         Section {
             Row(
@@ -165,6 +179,7 @@ struct SettingsView: View {
                 .fill(.neutral300)
                 .frame(height: 1)
             List {
+                premiumSection
                 mainSection
                 secondarySection
                 infoSection

@@ -8,6 +8,8 @@ class SettingsViewModel: ObservableObject {
 
     @Injected private var appStorage: AppStorage
 
+    @Published var isPremium = false
+
     private let router: SettingsRouter
 
     // MARK: - Public properties
@@ -18,10 +20,21 @@ class SettingsViewModel: ObservableObject {
 
     init(router: SettingsRouter) {
         self.router = router
+
+        bind()
+    }
+
+    private func bind() {
+        appStorage.$isPremium
+            .assign(to: &$isPremium)
     }
 
     func close() {
         router.close()
+    }
+
+    func openPaywall() {
+        router.openPaywall()
     }
 
     func openPrivacyPolicy() {
